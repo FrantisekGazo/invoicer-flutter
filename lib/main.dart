@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -73,7 +74,8 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-    final file = File('example.pdf');
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/example.pdf');
     await file.writeAsBytes(await pdf.save());
     print(file.path);
 

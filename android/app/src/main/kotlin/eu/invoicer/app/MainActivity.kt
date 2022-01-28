@@ -1,4 +1,4 @@
-package eu.invoicer.invoicer
+package eu.invoicer.app
 
 import io.flutter.embedding.android.FlutterActivity
 
