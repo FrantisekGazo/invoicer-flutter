@@ -65,7 +65,7 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
               SizedBox(height: 24),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: CustomVerticalDivider(),
+                child: _CustomVerticalDivider(),
               ),
               InvoiceDatesContainer(invoice: invoice),
               PaymentInfoContainer(invoice: invoice),
@@ -250,44 +250,20 @@ class InvoiceDatesContainer extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          InfoItem(
+          _InfoItem(
             title: 'Issued date',
             value: _dateFormatter.format(invoice.issueDate),
           ),
-          InfoItem(
+          _InfoItem(
             title: 'Delivery date',
             value: _dateFormatter.format(invoice.deliveryDate),
           ),
-          InfoItem(
+          _InfoItem(
             title: 'Due date',
             value: _dateFormatter.format(invoice.dueDate),
           ),
         ],
       ),
-    );
-  }
-}
-
-class InfoItem extends StatelessWidget {
-  final String title;
-  final String value;
-
-  InfoItem({
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(Context context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: theme.defaultTextStyle),
-        Text(value, style: theme.header5),
-      ],
     );
   }
 }
@@ -313,19 +289,19 @@ class PaymentInfoContainer extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            InfoItem(
+            _InfoItem(
               title: 'IBAN',
               value: bankAccount.iban,
             ),
-            InfoItem(
+            _InfoItem(
               title: 'SWIFT',
               value: bankAccount.swift,
             ),
-            InfoItem(
+            _InfoItem(
               title: 'VS',
               value: invoice.number,
             ),
-            InfoItem(
+            _InfoItem(
               title: 'Total price',
               value: invoice.formattedTotalPrice,
             ),
@@ -357,7 +333,7 @@ class SignatureContainer extends StatelessWidget {
           Expanded(
             child: Image(MemoryImage(signature)),
           ),
-          CustomVerticalDivider(),
+          _CustomVerticalDivider(),
           SizedBox(height: 2),
           Align(
             alignment: Alignment.center,
@@ -384,40 +360,41 @@ class InvoiceTable extends StatelessWidget {
   @override
   Widget build(Context context) {
     final theme = Theme.of(context);
+    final styleH = theme.header5;
     final currency = invoice.supplier.currency;
 
     final headers = [
-      '#',
-      'Description',
-      'Amount',
-      'Unit',
-      'Unit cost [${currency.symbol}]',
-      'Price [${currency.symbol}]',
+      Text('#', style: styleH),
+      Text('Description', style: styleH),
+      Text('Amount', style: styleH),
+      Text('Unit', style: styleH),
+      Text('Unit cost [${currency.symbol}]', style: styleH),
+      Text('Price [${currency.symbol}]', style: styleH),
     ];
     final values = invoice.items
         .mapIndexed(
-          (i, item) => <String>[
-            '${i + 1}',
-            item.name,
-            item.amount.toStringAsFixed(1),
-            item.unit,
-            currency.format(item.price, noSymbol: true),
-            currency.format(item.totalPrice, noSymbol: true),
+          (i, item) => <Widget>[
+            Text('${i + 1}'),
+            Text(item.name),
+            Text(item.amount.toStringAsFixed(1)),
+            Text(item.unit),
+            Text(currency.format(item.price, noSymbol: true)),
+            Text(currency.format(item.totalPrice, noSymbol: true)),
           ],
         )
         .toList();
-    final totalValues = [
-      '',
-      'Total',
-      '',
-      '',
-      '',
-      currency.format(invoice.totalPrice, noSymbol: true),
+    final footers = [
+      Text(''),
+      Text('Total', style: styleH),
+      Text(''),
+      Text(''),
+      Text(''),
+      Text(currency.format(invoice.totalPrice, noSymbol: true), style: styleH),
     ];
 
     return Table(
       columnWidths: {
-        0: const FixedColumnWidth(14.0),
+        0: const FixedColumnWidth(14),
       },
       children: [
         TableRow(
@@ -425,73 +402,74 @@ class InvoiceTable extends StatelessWidget {
             color: PdfColors.grey200,
             border: Border(bottom: BorderSide(width: 0.5)),
           ),
-          children: headers
-              .mapIndexed(
-                (i, header) => Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 2,
-                    horizontal: 6,
-                  ),
-                  child: Align(
-                    alignment: (i == 0)
-                        ? Alignment.center
-                        : (i == 1)
-                            ? Alignment.centerLeft
-                            : Alignment.centerRight,
-                    child: Text(header, style: theme.header5),
-                  ),
-                ),
-              )
-              .toList(),
+          children: headers.mapIndexed(InvoiceTableCell.new).toList(),
         ),
         ...values.map(
           (itemValues) => TableRow(
             decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(width: 0.5)),
             ),
-            children: itemValues
-                .mapIndexed(
-                  (i, value) => Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 2,
-                      horizontal: 4,
-                    ),
-                    child: Align(
-                      alignment: (i == 0)
-                          ? Alignment.center
-                          : (i == 1)
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
-                      child: Text(value),
-                    ),
-                  ),
-                )
-                .toList(),
+            children: itemValues.mapIndexed(InvoiceTableCell.new).toList(),
           ),
         ),
         TableRow(
           decoration: const BoxDecoration(
             color: PdfColors.grey200,
           ),
-          children: totalValues
-              .mapIndexed(
-                (i, value) => Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 2,
-                    horizontal: 4,
-                  ),
-                  child: Align(
-                    alignment: (i == 0)
-                        ? Alignment.center
-                        : (i == 1)
-                            ? Alignment.centerLeft
-                            : Alignment.centerRight,
-                    child: Text(value, style: theme.header5),
-                  ),
-                ),
-              )
-              .toList(),
+          children: footers.mapIndexed(InvoiceTableCell.new).toList(),
         ),
+      ],
+    );
+  }
+}
+
+class InvoiceTableCell extends StatelessWidget {
+  final int index;
+  final Widget child;
+
+  InvoiceTableCell(this.index, this.child);
+
+  @override
+  Widget build(Context context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 2,
+        horizontal: 6,
+      ),
+      child: Align(
+        alignment: (index == 0)
+            ? Alignment.center
+            : (index == 1)
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+        child: child,
+      ),
+    );
+  }
+}
+
+///
+/// Shows a title & value in a column.
+///
+class _InfoItem extends StatelessWidget {
+  final String title;
+  final String value;
+
+  _InfoItem({
+    required this.title,
+    required this.value,
+  });
+
+  @override
+  Widget build(Context context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: theme.defaultTextStyle),
+        Text(value, style: theme.header5),
       ],
     );
   }
@@ -500,7 +478,7 @@ class InvoiceTable extends StatelessWidget {
 ///
 /// Use this cause [Divider] from pdf package min height is 1.
 ///
-class CustomVerticalDivider extends StatelessWidget {
+class _CustomVerticalDivider extends StatelessWidget {
   @override
   Widget build(Context context) {
     return DecoratedBox(
