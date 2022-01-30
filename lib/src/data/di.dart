@@ -19,7 +19,7 @@ Future<void> initDI() async {
     FontServiceImpl(),
   );
   getIt.registerSingleton<PdfBuilderService>(
-    PdfBuilderServiceImpl(inject()),
+    PdfBuilderServiceImpl(inject(), inject()),
   );
   getIt.registerSingleton<NavigationService>(
     NavigationServiceImpl(inject()),

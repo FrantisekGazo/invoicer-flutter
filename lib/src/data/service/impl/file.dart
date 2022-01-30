@@ -22,6 +22,15 @@ class FileServiceImpl implements FileService {
   }
 
   @override
+  File getFile(String relativePath) {
+    final mainDirPath = _mainDir.value?.path;
+    if (mainDirPath == null) {
+      throw StateError('Main directory not setup');
+    }
+    return File('$mainDirPath/$relativePath');
+  }
+
+  @override
   FutureOr onDispose() async {
     _mainDir.dispose();
   }

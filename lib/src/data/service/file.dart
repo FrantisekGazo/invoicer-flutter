@@ -9,4 +9,6 @@ abstract class FileService extends Disposable {
 
   /// Returns true on success
   Future<bool> selectMainDirectory();
+
+  File getFile(String relativePath);
 }

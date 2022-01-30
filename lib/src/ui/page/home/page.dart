@@ -2,7 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:invoicer/src/data/di.dart';
+import 'package:invoicer/src/data/model/bank_account.dart';
+import 'package:invoicer/src/data/model/client.dart';
+import 'package:invoicer/src/data/model/currency.dart';
 import 'package:invoicer/src/data/model/invoice.dart';
+import 'package:invoicer/src/data/model/supplier.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/pdf.dart';
 
@@ -73,7 +77,53 @@ class _HomePageState extends State<HomePage> {
     if (dir != null) {
       final invoice = Invoice(
         number: '20XX00Y',
-        signature: File('${dir.path}/assets/signature.png'),
+        supplier: const Supplier(
+          name: 'Adam Smith',
+          address: [
+            'Aaaaaa XXXX/Y',
+            '01234 Aaaaaa',
+            'Slovakia',
+          ],
+          ico: '1234567890',
+          dic: '0987654321',
+          icdph: 'SK0987654321',
+          phone: '+421 949 111 222',
+          email: 'test@gmail.com',
+          numbering: 'YYYYccc',
+          currency: Currency.eur,
+          bankAccount: BankAccount(
+            iban: 'SK12 1111 2222 3333 4444',
+            swift: 'ASDFGH',
+          ),
+          signaturePath: 'assets/signature.png',
+          clients: [],
+        ),
+        client: const Client(
+          name: 'Company A',
+          type: '???',
+          address: [
+            'Zzzzzz CCCCC/O',
+            '56789 Bbbbbbb',
+            'Česká Republika',
+          ],
+          ico: '121212121212',
+          dic: '45454545454',
+          icdph: 'CZ45454545454',
+          order: 0,
+          price: 30,
+          projects: [],
+        ),
+        items: const [
+          InvoiceItem(
+            name: 'Application development',
+            amount: 1,
+            unit: 'pc',
+            price: 1000,
+          ),
+        ],
+        issueDate: DateTime(2020, 8, 15),
+        deliveryDate: DateTime(2020, 8, 15),
+        dueDate: DateTime(2020, 8, 30),
       );
       final pdf = await _pdfBuilderService.build(invoice);
 

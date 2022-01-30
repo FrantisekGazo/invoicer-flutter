@@ -1,16 +1,24 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
+import 'package:invoicer/src/data/model/client.dart';
+import 'package:invoicer/src/data/model/currency.dart';
 import 'package:invoicer/src/data/model/invoice.dart';
+import 'package:invoicer/src/data/model/supplier.dart';
+import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/font.dart';
 import 'package:invoicer/src/data/service/pdf.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 class PdfBuilderServiceImpl implements PdfBuilderService {
+  final FileService _fileService;
   final FontService _fontService;
 
   PdfBuilderServiceImpl(
+    this._fileService,
     this._fontService,
   );
 
@@ -27,7 +35,8 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
       header2: TextStyle(font: boldFont, fontSize: 16),
       header1: TextStyle(font: boldFont, fontSize: 18),
     );
-    final signatureBytes = await invoice.signature.readAsBytes();
+    final signature = _fileService.getFile(invoice.supplier.signaturePath);
+    final signatureBytes = await signature.readAsBytes();
 
     return Document(theme: theme)
       ..addPage(
@@ -43,9 +52,14 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
               ),
               SizedBox(height: 24),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: SupplierContainer()),
-                  Expanded(child: CustomerContainer()),
+                  Expanded(
+                    child: SupplierContainer(supplier: invoice.supplier),
+                  ),
+                  Expanded(
+                    child: CustomerContainer(client: invoice.client),
+                  ),
                 ],
               ),
               SizedBox(height: 24),
@@ -53,13 +67,10 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: CustomVerticalDivider(),
               ),
-              InvoiceDatesContainer(),
-              PaymentInfoContainer(),
+              InvoiceDatesContainer(invoice: invoice),
+              PaymentInfoContainer(invoice: invoice),
               SizedBox(height: 24),
-              Expanded(
-                flex: 1,
-                child: Placeholder(),
-              ),
+              InvoiceTable(invoice: invoice),
               Expanded(
                 flex: 1,
                 child: Align(
@@ -110,6 +121,12 @@ class InvoiceTitle extends StatelessWidget {
 }
 
 class SupplierContainer extends StatelessWidget {
+  final Supplier supplier;
+
+  SupplierContainer({
+    required this.supplier,
+  });
+
   @override
   Widget build(Context context) {
     final theme = Theme.of(context);
@@ -125,13 +142,11 @@ class SupplierContainer extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12),
-        Text('John Smith', style: theme.header5),
-        Text('Limbová 1234/5'),
-        Text('01234 Žzzzzzz'),
-        Text('Slovakia'),
+        Text(supplier.name, style: theme.header5),
+        ...supplier.address.map((it) => Text(it)),
         SizedBox(height: 4),
-        Text('Identification number: 1234567890'),
-        Text('VAT number: SK1234567890'),
+        Text('Identification number: ${supplier.dic}'),
+        Text('VAT number: ${supplier.icdph}'),
         Text(
           'Invoice is in reverse charge mode.',
           style: theme.defaultTextStyle.copyWith(
@@ -144,15 +159,22 @@ class SupplierContainer extends StatelessWidget {
             fontSize: 8,
           ),
         ),
-        SizedBox(height: 4),
-        Text('Phone: +421949654321'),
-        Text('Email: john.smith@gmail.com'),
+        if (supplier.phone != null || supplier.email != null)
+          SizedBox(height: 4),
+        if (supplier.phone != null) Text('Phone: ${supplier.phone}'),
+        if (supplier.email != null) Text('Email: ${supplier.email}'),
       ],
     );
   }
 }
 
 class CustomerContainer extends StatelessWidget {
+  final Client client;
+
+  CustomerContainer({
+    required this.client,
+  });
+
   @override
   Widget build(Context context) {
     final theme = Theme.of(context);
@@ -182,12 +204,10 @@ class CustomerContainer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 4),
-                    Text('John Smith', style: theme.header5),
-                    Text('Limbová 1234/5'),
-                    Text('01234 Žzzzzzz'),
-                    Text('Slovakia'),
+                    Text(client.name, style: theme.header5),
+                    ...client.address.map((it) => Text(it)),
                     SizedBox(height: 4),
-                    Text('VAT number: SK1234567890'),
+                    Text('VAT number: ${client.icdph}'),
                   ],
                 ),
               ),
@@ -216,6 +236,13 @@ class CustomerContainer extends StatelessWidget {
 }
 
 class InvoiceDatesContainer extends StatelessWidget {
+  final Invoice invoice;
+  static final _dateFormatter = DateFormat('dd.MM.yyyy');
+
+  InvoiceDatesContainer({
+    required this.invoice,
+  });
+
   @override
   Widget build(Context context) {
     return Padding(
@@ -225,15 +252,15 @@ class InvoiceDatesContainer extends StatelessWidget {
         children: [
           InfoItem(
             title: 'Issued date',
-            value: '15.03.2021',
+            value: _dateFormatter.format(invoice.issueDate),
           ),
           InfoItem(
             title: 'Delivery date',
-            value: '15.03.2021',
+            value: _dateFormatter.format(invoice.deliveryDate),
           ),
           InfoItem(
             title: 'Due date',
-            value: '31.03.2021',
+            value: _dateFormatter.format(invoice.dueDate),
           ),
         ],
       ),
@@ -266,8 +293,15 @@ class InfoItem extends StatelessWidget {
 }
 
 class PaymentInfoContainer extends StatelessWidget {
+  final Invoice invoice;
+
+  PaymentInfoContainer({
+    required this.invoice,
+  });
+
   @override
   Widget build(Context context) {
+    final bankAccount = invoice.supplier.bankAccount;
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(width: 0.5),
@@ -281,19 +315,19 @@ class PaymentInfoContainer extends StatelessWidget {
           children: [
             InfoItem(
               title: 'IBAN',
-              value: 'SK12 1234 5678 9012 3456 7890',
+              value: bankAccount.iban,
             ),
             InfoItem(
               title: 'SWIFT',
-              value: 'BREXSKBX',
+              value: bankAccount.swift,
             ),
             InfoItem(
               title: 'VS',
-              value: '20XX00Y',
+              value: invoice.number,
             ),
             InfoItem(
               title: 'Total price',
-              value: '5 000,00 EUR',
+              value: invoice.formattedTotalPrice,
             ),
           ],
         ),
@@ -336,6 +370,129 @@ class SignatureContainer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class InvoiceTable extends StatelessWidget {
+  final Invoice invoice;
+
+  InvoiceTable({
+    required this.invoice,
+  });
+
+  @override
+  Widget build(Context context) {
+    final theme = Theme.of(context);
+    final currency = invoice.supplier.currency;
+
+    final headers = [
+      '#',
+      'Description',
+      'Amount',
+      'Unit',
+      'Unit cost [${currency.symbol}]',
+      'Price [${currency.symbol}]',
+    ];
+    final values = invoice.items
+        .mapIndexed(
+          (i, item) => <String>[
+            '${i + 1}',
+            item.name,
+            item.amount.toStringAsFixed(1),
+            item.unit,
+            currency.format(item.price, noSymbol: true),
+            currency.format(item.totalPrice, noSymbol: true),
+          ],
+        )
+        .toList();
+    final totalValues = [
+      '',
+      'Total',
+      '',
+      '',
+      '',
+      currency.format(invoice.totalPrice, noSymbol: true),
+    ];
+
+    return Table(
+      columnWidths: {
+        0: const FixedColumnWidth(14.0),
+      },
+      children: [
+        TableRow(
+          decoration: const BoxDecoration(
+            color: PdfColors.grey200,
+            border: Border(bottom: BorderSide(width: 0.5)),
+          ),
+          children: headers
+              .mapIndexed(
+                (i, header) => Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 2,
+                    horizontal: 6,
+                  ),
+                  child: Align(
+                    alignment: (i == 0)
+                        ? Alignment.center
+                        : (i == 1)
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight,
+                    child: Text(header, style: theme.header5),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+        ...values.map(
+          (itemValues) => TableRow(
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(width: 0.5)),
+            ),
+            children: itemValues
+                .mapIndexed(
+                  (i, value) => Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 2,
+                      horizontal: 4,
+                    ),
+                    child: Align(
+                      alignment: (i == 0)
+                          ? Alignment.center
+                          : (i == 1)
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
+                      child: Text(value),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+        TableRow(
+          decoration: const BoxDecoration(
+            color: PdfColors.grey200,
+          ),
+          children: totalValues
+              .mapIndexed(
+                (i, value) => Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 2,
+                    horizontal: 4,
+                  ),
+                  child: Align(
+                    alignment: (i == 0)
+                        ? Alignment.center
+                        : (i == 1)
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight,
+                    child: Text(value, style: theme.header5),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
     );
   }
 }
