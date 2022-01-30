@@ -33,6 +33,7 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
       ..addPage(
         Page(
           build: (context) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Align(
                 alignment: Alignment.topLeft,
@@ -48,6 +49,10 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
                 ],
               ),
               SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: CustomVerticalDivider(),
+              ),
               InvoiceDatesContainer(),
               PaymentInfoContainer(),
               SizedBox(height: 24),
@@ -213,29 +218,24 @@ class CustomerContainer extends StatelessWidget {
 class InvoiceDatesContainer extends StatelessWidget {
   @override
   Widget build(Context context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(width: 0.5)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            InfoItem(
-              title: 'Issued date',
-              value: '15.03.2021',
-            ),
-            InfoItem(
-              title: 'Delivery date',
-              value: '15.03.2021',
-            ),
-            InfoItem(
-              title: 'Due date',
-              value: '31.03.2021',
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          InfoItem(
+            title: 'Issued date',
+            value: '15.03.2021',
+          ),
+          InfoItem(
+            title: 'Delivery date',
+            value: '15.03.2021',
+          ),
+          InfoItem(
+            title: 'Due date',
+            value: '31.03.2021',
+          ),
+        ],
       ),
     );
   }
@@ -323,11 +323,7 @@ class SignatureContainer extends StatelessWidget {
           Expanded(
             child: Image(MemoryImage(signature)),
           ),
-          DecoratedBox(
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(width: 0.5)),
-            ),
-          ),
+          CustomVerticalDivider(),
           SizedBox(height: 2),
           Align(
             alignment: Alignment.center,
@@ -339,6 +335,20 @@ class SignatureContainer extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+///
+/// Use this cause [Divider] from pdf package min height is 1.
+///
+class CustomVerticalDivider extends StatelessWidget {
+  @override
+  Widget build(Context context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(width: 0.5)),
       ),
     );
   }
