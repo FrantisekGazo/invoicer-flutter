@@ -9,6 +9,7 @@ import 'package:invoicer/src/data/model/invoice.dart';
 import 'package:invoicer/src/data/model/supplier.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/font.dart';
+import 'package:invoicer/src/data/service/localized.dart';
 import 'package:invoicer/src/data/service/pdf.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
@@ -16,10 +17,12 @@ import 'package:pdf/widgets.dart';
 class PdfBuilderServiceImpl implements PdfBuilderService {
   final FileService _fileService;
   final FontService _fontService;
+  final LocalizedService _localizedService;
 
   PdfBuilderServiceImpl(
     this._fileService,
     this._fontService,
+    this._localizedService,
   );
 
   @override
@@ -37,6 +40,8 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
     );
     final signature = _fileService.getFile(invoice.supplier.signaturePath);
     final signatureBytes = await signature.readAsBytes();
+    final localized =
+        _localizedService.getLocalizedDoc(invoice.client.isForeign);
 
     return Document(theme: theme)
       ..addPage(
@@ -47,6 +52,7 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
               Align(
                 alignment: Alignment.topLeft,
                 child: InvoiceTitle(
+                  localized: localized,
                   number: invoice.number,
                 ),
               ),
@@ -55,10 +61,16 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: SupplierContainer(supplier: invoice.supplier),
+                    child: SupplierContainer(
+                      localized: localized,
+                      supplier: invoice.supplier,
+                    ),
                   ),
                   Expanded(
-                    child: CustomerContainer(client: invoice.client),
+                    child: ClientContainer(
+                      localized: localized,
+                      client: invoice.client,
+                    ),
                   ),
                 ],
               ),
@@ -67,10 +79,19 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: _CustomVerticalDivider(),
               ),
-              InvoiceDatesContainer(invoice: invoice),
-              PaymentInfoContainer(invoice: invoice),
+              InvoiceDatesContainer(
+                localized: localized,
+                invoice: invoice,
+              ),
+              PaymentInfoContainer(
+                localized: localized,
+                invoice: invoice,
+              ),
               SizedBox(height: 24),
-              InvoiceTable(invoice: invoice),
+              InvoiceTable(
+                localized: localized,
+                invoice: invoice,
+              ),
               Expanded(
                 flex: 1,
                 child: Align(
@@ -78,6 +99,7 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 24),
                     child: SignatureContainer(
+                      localized: localized,
                       signature: signatureBytes,
                     ),
                   ),
@@ -94,21 +116,24 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
 }
 
 class InvoiceTitle extends StatelessWidget {
+  final LocalizedDocument localized;
   final String number;
 
   InvoiceTitle({
+    required this.localized,
     required this.number,
   });
 
   @override
   Widget build(Context context) {
     final theme = Theme.of(context);
+
     return RichText(
       textAlign: TextAlign.left,
       text: TextSpan(
         children: [
           TextSpan(
-            text: 'Invoice  ',
+            text: '${localized.invoice}  ',
             style: theme.defaultTextStyle.copyWith(
               fontSize: theme.header4.fontSize,
             ),
@@ -121,57 +146,54 @@ class InvoiceTitle extends StatelessWidget {
 }
 
 class SupplierContainer extends StatelessWidget {
+  final LocalizedDocument localized;
   final Supplier supplier;
 
   SupplierContainer({
+    required this.localized,
     required this.supplier,
   });
 
   @override
   Widget build(Context context) {
     final theme = Theme.of(context);
+    final stylePar7 = theme.defaultTextStyle.copyWith(fontSize: 8);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'SUPPLIER',
-          style: theme.defaultTextStyle.copyWith(
-            letterSpacing: 2,
-          ),
+          localized.supplier.toUpperCase(),
+          style: theme.defaultTextStyle.copyWith(letterSpacing: 2),
         ),
         SizedBox(height: 12),
         Text(supplier.name, style: theme.header5),
         ...supplier.address.map((it) => Text(it)),
         SizedBox(height: 4),
-        Text('Identification number: ${supplier.dic}'),
-        Text('VAT number: ${supplier.icdph}'),
-        Text(
-          'Invoice is in reverse charge mode.',
-          style: theme.defaultTextStyle.copyWith(
-            fontSize: 8,
-          ),
-        ),
-        Text(
-          'The buyer is obligated to fill in the VAT amounts and pay the tax.',
-          style: theme.defaultTextStyle.copyWith(
-            fontSize: 8,
-          ),
-        ),
+        if (supplier.ico != null) Text('${localized.ico}: ${supplier.ico}'),
+        if (supplier.dic != null) Text('${localized.dic}: ${supplier.dic}'),
+        if (supplier.icdph != null)
+          Text('${localized.icdph}: ${supplier.icdph}'),
+        Text(localized.dphPar7Part1, style: stylePar7),
+        Text(localized.dphPar7Part2, style: stylePar7),
         if (supplier.phone != null || supplier.email != null)
           SizedBox(height: 4),
-        if (supplier.phone != null) Text('Phone: ${supplier.phone}'),
-        if (supplier.email != null) Text('Email: ${supplier.email}'),
+        if (supplier.phone != null)
+          Text('${localized.phone}: ${supplier.phone}'),
+        if (supplier.email != null)
+          Text('${localized.email}: ${supplier.email}'),
       ],
     );
   }
 }
 
-class CustomerContainer extends StatelessWidget {
+class ClientContainer extends StatelessWidget {
+  final LocalizedDocument localized;
   final Client client;
 
-  CustomerContainer({
+  ClientContainer({
+    required this.localized,
     required this.client,
   });
 
@@ -207,7 +229,12 @@ class CustomerContainer extends StatelessWidget {
                     Text(client.name, style: theme.header5),
                     ...client.address.map((it) => Text(it)),
                     SizedBox(height: 4),
-                    Text('VAT number: ${client.icdph}'),
+                    if (client.ico != null)
+                      Text('${localized.ico}: ${client.ico}'),
+                    if (client.dic != null)
+                      Text('${localized.dic}: ${client.dic}'),
+                    if (client.icdph != null)
+                      Text('${localized.icdph}: ${client.icdph}'),
                   ],
                 ),
               ),
@@ -217,14 +244,12 @@ class CustomerContainer extends StatelessWidget {
             top: 0,
             left: 16,
             child: Container(
-              color: PdfColor.fromHex('#FFFFFF'),
+              color: PdfColors.white,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  'CUSTOMER',
-                  style: theme.defaultTextStyle.copyWith(
-                    letterSpacing: 2,
-                  ),
+                  localized.client.toUpperCase(),
+                  style: theme.defaultTextStyle.copyWith(letterSpacing: 2),
                 ),
               ),
             ),
@@ -236,10 +261,12 @@ class CustomerContainer extends StatelessWidget {
 }
 
 class InvoiceDatesContainer extends StatelessWidget {
+  final LocalizedDocument localized;
   final Invoice invoice;
   static final _dateFormatter = DateFormat('dd.MM.yyyy');
 
   InvoiceDatesContainer({
+    required this.localized,
     required this.invoice,
   });
 
@@ -251,15 +278,15 @@ class InvoiceDatesContainer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _InfoItem(
-            title: 'Issued date',
+            title: localized.issueDate,
             value: _dateFormatter.format(invoice.issueDate),
           ),
           _InfoItem(
-            title: 'Delivery date',
+            title: localized.deliveryDate,
             value: _dateFormatter.format(invoice.deliveryDate),
           ),
           _InfoItem(
-            title: 'Due date',
+            title: localized.dueDate,
             value: _dateFormatter.format(invoice.dueDate),
           ),
         ],
@@ -269,9 +296,11 @@ class InvoiceDatesContainer extends StatelessWidget {
 }
 
 class PaymentInfoContainer extends StatelessWidget {
+  final LocalizedDocument localized;
   final Invoice invoice;
 
   PaymentInfoContainer({
+    required this.localized,
     required this.invoice,
   });
 
@@ -290,19 +319,19 @@ class PaymentInfoContainer extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _InfoItem(
-              title: 'IBAN',
+              title: localized.iban,
               value: bankAccount.iban,
             ),
             _InfoItem(
-              title: 'SWIFT',
+              title: localized.swift,
               value: bankAccount.swift,
             ),
             _InfoItem(
-              title: 'VS',
+              title: localized.variableSymbol,
               value: invoice.number,
             ),
             _InfoItem(
-              title: 'Total price',
+              title: localized.totalPrice,
               value: invoice.formattedTotalPrice,
             ),
           ],
@@ -313,10 +342,13 @@ class PaymentInfoContainer extends StatelessWidget {
 }
 
 class SignatureContainer extends StatelessWidget {
+  final LocalizedDocument localized;
+
   /// Signature image file content.
   final Uint8List signature;
 
   SignatureContainer({
+    required this.localized,
     required this.signature,
   });
 
@@ -338,7 +370,7 @@ class SignatureContainer extends StatelessWidget {
           Align(
             alignment: Alignment.center,
             child: Text(
-              'Signature',
+              localized.signature,
               style: theme.defaultTextStyle.copyWith(
                 fontSize: 8,
               ),
@@ -351,9 +383,11 @@ class SignatureContainer extends StatelessWidget {
 }
 
 class InvoiceTable extends StatelessWidget {
+  final LocalizedDocument localized;
   final Invoice invoice;
 
   InvoiceTable({
+    required this.localized,
     required this.invoice,
   });
 
@@ -364,12 +398,12 @@ class InvoiceTable extends StatelessWidget {
     final currency = invoice.supplier.currency;
 
     final headers = [
-      Text('#', style: styleH),
-      Text('Description', style: styleH),
-      Text('Amount', style: styleH),
-      Text('Unit', style: styleH),
-      Text('Unit cost [${currency.symbol}]', style: styleH),
-      Text('Price [${currency.symbol}]', style: styleH),
+      Text(localized.itemNumber, style: styleH),
+      Text(localized.itemName, style: styleH),
+      Text(localized.itemAmount, style: styleH),
+      Text(localized.itemUnit, style: styleH),
+      Text('${localized.itemUnitCost} [${currency.symbol}]', style: styleH),
+      Text('${localized.itemPrice} [${currency.symbol}]', style: styleH),
     ];
     final values = invoice.items
         .mapIndexed(
@@ -385,7 +419,7 @@ class InvoiceTable extends StatelessWidget {
         .toList();
     final footers = [
       Text(''),
-      Text('Total', style: styleH),
+      Text(localized.total, style: styleH),
       Text(''),
       Text(''),
       Text(''),
@@ -393,9 +427,6 @@ class InvoiceTable extends StatelessWidget {
     ];
 
     return Table(
-      columnWidths: {
-        0: const FixedColumnWidth(14),
-      },
       children: [
         TableRow(
           decoration: const BoxDecoration(

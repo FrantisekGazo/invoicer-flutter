@@ -3,8 +3,10 @@ import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/font.dart';
 import 'package:invoicer/src/data/service/impl/file.dart';
 import 'package:invoicer/src/data/service/impl/font.dart';
+import 'package:invoicer/src/data/service/impl/localized.dart';
 import 'package:invoicer/src/data/service/impl/navigation.dart';
 import 'package:invoicer/src/data/service/impl/pdf.dart';
+import 'package:invoicer/src/data/service/localized.dart';
 import 'package:invoicer/src/data/service/navigation.dart';
 import 'package:invoicer/src/data/service/pdf.dart';
 
@@ -12,6 +14,9 @@ final getIt = GetIt.instance;
 final inject = getIt.get;
 
 Future<void> initDI() async {
+  getIt.registerSingleton<LocalizedService>(
+    LocalizedServiceImpl(),
+  );
   getIt.registerSingleton<FileService>(
     FileServiceImpl(),
   );
@@ -19,7 +24,7 @@ Future<void> initDI() async {
     FontServiceImpl(),
   );
   getIt.registerSingleton<PdfBuilderService>(
-    PdfBuilderServiceImpl(inject(), inject()),
+    PdfBuilderServiceImpl(inject(), inject(), inject()),
   );
   getIt.registerSingleton<NavigationService>(
     NavigationServiceImpl(inject()),

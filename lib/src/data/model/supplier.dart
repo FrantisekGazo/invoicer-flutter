@@ -7,9 +7,9 @@ import 'package:meta/meta.dart';
 class Supplier {
   final String name;
   final List<String> address;
-  final String ico;
-  final String dic;
-  final String icdph;
+  final String? ico;
+  final String? dic;
+  final String? icdph;
   final String? phone;
   final String? email;
   final BankAccount bankAccount;
@@ -21,9 +21,9 @@ class Supplier {
   const Supplier({
     required this.name,
     required this.address,
-    required this.ico,
-    required this.dic,
-    required this.icdph,
+    this.ico,
+    this.dic,
+    this.icdph,
     this.phone,
     this.email,
     required this.bankAccount,

@@ -7,9 +7,9 @@ class Client {
   final String type;
   final int order;
   final List<String> address;
-  final String ico;
-  final String dic;
-  final String icdph;
+  final String? ico;
+  final String? dic;
+  final String? icdph;
   final double price;
   final List<Project> projects;
 
@@ -17,12 +17,12 @@ class Client {
     required this.name,
     required this.type,
     required this.address,
-    required this.ico,
-    required this.dic,
-    required this.icdph,
+    this.ico,
+    this.dic,
+    this.icdph,
     required this.projects,
     required this.price,
-    required this.order,
+    this.order = 0,
   });
 
   bool get isForeign {
