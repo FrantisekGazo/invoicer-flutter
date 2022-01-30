@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:invoicer/src/data/di.dart';
+import 'package:invoicer/src/data/model/invoice.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/pdf.dart';
 
@@ -68,10 +69,14 @@ class _HomePageState extends State<HomePage> {
   Future<void> _run() async {
     _loading.value = true;
 
-    final pdf = await _pdfBuilderService.build();
-
     final dir = _fileService.mainDirectory.value;
     if (dir != null) {
+      final invoice = Invoice(
+        number: '20XX00Y',
+        signature: File('${dir.path}/assets/signature.png'),
+      );
+      final pdf = await _pdfBuilderService.build(invoice);
+
       final file = File('${dir.path}/invoices/example.pdf');
       await file.writeAsBytes(await pdf.save());
       _logs.value = 'file: ${file.path}';
