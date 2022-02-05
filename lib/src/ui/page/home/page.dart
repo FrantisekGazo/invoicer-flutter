@@ -6,6 +6,9 @@ import 'package:invoicer/src/data/model/bank_account.dart';
 import 'package:invoicer/src/data/model/client.dart';
 import 'package:invoicer/src/data/model/currency.dart';
 import 'package:invoicer/src/data/model/invoice.dart';
+import 'package:invoicer/src/data/model/language.dart';
+import 'package:invoicer/src/data/model/project.dart';
+import 'package:invoicer/src/data/model/project_type.dart';
 import 'package:invoicer/src/data/model/supplier.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/pdf.dart';
@@ -100,7 +103,6 @@ class _HomePageState extends State<HomePage> {
         ),
         client: const Client(
           name: 'Company A',
-          type: '???',
           address: [
             'Zzzzzz CCCCC/O',
             '56789 Bbbbbbb',
@@ -109,9 +111,8 @@ class _HomePageState extends State<HomePage> {
           ico: '121212121212',
           dic: '45454545454',
           icdph: 'CZ45454545454',
-          order: 0,
-          price: 30,
           projects: [],
+          lang: Language.en,
         ),
         items: const [
           InvoiceItem(

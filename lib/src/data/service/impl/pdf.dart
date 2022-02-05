@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:invoicer/src/data/model/client.dart';
 import 'package:invoicer/src/data/model/currency.dart';
 import 'package:invoicer/src/data/model/invoice.dart';
+import 'package:invoicer/src/data/model/language.dart';
 import 'package:invoicer/src/data/model/supplier.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/font.dart';
@@ -64,6 +65,7 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
                     child: SupplierContainer(
                       localized: localized,
                       supplier: invoice.supplier,
+                      client: invoice.client,
                     ),
                   ),
                   Expanded(
@@ -148,10 +150,12 @@ class InvoiceTitle extends StatelessWidget {
 class SupplierContainer extends StatelessWidget {
   final LocalizedDocument localized;
   final Supplier supplier;
+  final Client client;
 
   SupplierContainer({
     required this.localized,
     required this.supplier,
+    required this.client,
   });
 
   @override
@@ -171,14 +175,21 @@ class SupplierContainer extends StatelessWidget {
         Text(supplier.name, style: theme.header5),
         ...supplier.address.map((it) => Text(it)),
         SizedBox(height: 4),
-        if (supplier.ico != null) Text('${localized.ico}: ${supplier.ico}'),
-        if (supplier.dic != null) Text('${localized.dic}: ${supplier.dic}'),
-        if (supplier.icdph != null)
-          Text('${localized.icdph}: ${supplier.icdph}'),
-        Text(localized.dphPar7Part1, style: stylePar7),
-        Text(localized.dphPar7Part2, style: stylePar7),
-        if (supplier.phone != null || supplier.email != null)
-          SizedBox(height: 4),
+        Text('${localized.ico}: ${supplier.ico}'),
+        if (client.lang != Language.en)
+          Text('${localized.dic}: ${supplier.dic}'),
+        ...(client.isForeign)
+            ? [
+                Text('${localized.icdph}: ${supplier.icdph}'),
+                SizedBox(height: 4),
+                Text(localized.dphPar7Part1, style: stylePar7),
+                Text(localized.dphPar7Part2, style: stylePar7),
+              ]
+            : [
+                SizedBox(height: 4),
+                Text(localized.dphNo, style: stylePar7),
+              ],
+        SizedBox(height: 4),
         if (supplier.phone != null)
           Text('${localized.phone}: ${supplier.phone}'),
         if (supplier.email != null)

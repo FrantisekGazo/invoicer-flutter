@@ -29,7 +29,7 @@ class _EnLocalizedDocument implements LocalizedDocument {
   String get icdph => 'VAT number';
 
   @override
-  String get dphNumber => throw UnsupportedError('no translation');
+  String get dphNo => throw UnsupportedError('no translation');
 
   @override
   String get dphPar7Part1 => 'Invoice is in reverse charge mode.';
@@ -136,7 +136,7 @@ class _SkLocalizedDocument implements LocalizedDocument {
   String get icdph => 'IČ DPH';
 
   @override
-  String get dphNumber => 'Nie je platiteľ DPH';
+  String get dphNo => 'Nie je platiteľ DPH';
 
   @override
   String get dphPar7Part1 => 'Osoba registrovaná podľa §7a zákona o DPH.';

@@ -15,7 +15,7 @@ abstract class LocalizedDocument {
 
   String get icdph;
 
-  String get dphNumber;
+  String get dphNo;
 
   String get dphPar7Part1;
 
