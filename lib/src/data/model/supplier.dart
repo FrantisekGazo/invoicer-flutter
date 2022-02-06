@@ -32,4 +32,40 @@ class Supplier {
     required this.signaturePath,
     required this.clients,
   });
+
+  Supplier.fromJson(Map<String, dynamic> data)
+      : this(
+          name: data['name'],
+          address: (data['address'] as List).cast<String>(),
+          ico: data['ico'],
+          dic: data['dic'],
+          icdph: data['icdph'],
+          phone: data['phone'],
+          email: data['email'],
+          bankAccount: BankAccount.fromJson(data['bank_account']),
+          currency: CurrencyUtil.forName(data['currency']),
+          numbering: data['numbering'],
+          signaturePath: data['signature'],
+          clients: (data['clients'] as List)
+              .cast<Map<String, dynamic>>()
+              .map(Client.formJson)
+              .toList(),
+        );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'address': address,
+      'ico': ico,
+      'dic': dic,
+      'icdph': icdph,
+      'phone': phone,
+      'email': email,
+      'bank_account': bankAccount.toJson(),
+      'currency': currency.name,
+      'numbering': numbering,
+      'signature': signaturePath,
+      'clients': clients.map((c) => c.toJson()).toList(),
+    };
+  }
 }

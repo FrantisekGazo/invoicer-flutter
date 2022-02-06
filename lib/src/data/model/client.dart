@@ -30,6 +30,23 @@ class Client implements Comparable<Client> {
     required this.lang,
   });
 
+  Client.formJson(Map<String, dynamic> data)
+      : this(
+          name: data['name'],
+          address: (data['address'] as List).cast<String>(),
+          ico: data['ico'],
+          dic: data['dic'],
+          icdph: data['icdph'],
+          projects: (data['projects'] as List)
+              .cast<Map<String, dynamic>>()
+              .map(Project.fromJson)
+              .toList(),
+          order: data['order'],
+          lang: (data['lang'] != null)
+              ? LanguageUtil.forName(data['lang'])
+              : Language.sk,
+        );
+
   bool get isForeign {
     return address.last != 'Slovensko' && address.last != 'Slovakia';
   }
@@ -47,5 +64,18 @@ class Client implements Comparable<Client> {
       // other.order is non-null
       return 1;
     }
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'address': address,
+      'ico': ico,
+      'dic': dic,
+      'icdph': icdph,
+      'projects': projects.map((project) => project.toJson()).toList(),
+      'order': order,
+      'lang': lang.name,
+    };
   }
 }

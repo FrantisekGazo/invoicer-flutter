@@ -14,4 +14,23 @@ class Project {
     required this.aliases,
     this.defaultPrice,
   });
+
+  Project.fromJson(Map<String, dynamic> data)
+      : this(
+          name: data['name'],
+          type: ProjectTypeUtil.forName(data['type']),
+          aliases: (data['aliases'] != null)
+              ? (data['aliases'] as List).cast<String>()
+              : const [],
+          defaultPrice: data['default_price'],
+        );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'type': type.name,
+      'aliases': aliases,
+      'default_price': defaultPrice,
+    };
+  }
 }

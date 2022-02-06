@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:invoicer/src/data/dao/impl/supplier.dart';
+import 'package:invoicer/src/data/dao/supplier.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/font.dart';
 import 'package:invoicer/src/data/service/impl/file.dart';
@@ -20,6 +22,11 @@ Future<void> initDI() async {
   getIt.registerSingleton<FileService>(
     FileServiceImpl(),
   );
+
+  getIt.registerSingleton<SupplierDao>(
+    FileSupplierDaoImpl(inject(), 'supplier.json'),
+  );
+
   getIt.registerSingleton<FontService>(
     FontServiceImpl(),
   );

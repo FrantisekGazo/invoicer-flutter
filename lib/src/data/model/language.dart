@@ -6,7 +6,7 @@ enum Language {
 abstract class LanguageUtil {
   static Language forName(String name) {
     for (final lang in Language.values) {
-      if (lang.name == name) {
+      if (lang.name == name.toLowerCase()) {
         return lang;
       }
     }

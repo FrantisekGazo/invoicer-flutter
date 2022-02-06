@@ -6,9 +6,9 @@ enum ProjectType {
 }
 
 abstract class ProjectTypeUtil {
-  ProjectType forName(String name) {
+  static ProjectType forName(String name) {
     for (final type in ProjectType.values) {
-      if (name == type.name) {
+      if (type.name == name.toLowerCase()) {
         return type;
       }
     }

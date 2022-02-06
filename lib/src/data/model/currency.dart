@@ -41,7 +41,7 @@ extension CurrencyExt on Currency {
 abstract class CurrencyUtil {
   static Currency forName(String name) {
     for (final currency in Currency.values) {
-      if (currency.name == name) {
+      if (currency.name == name.toLowerCase()) {
         return currency;
       }
     }
