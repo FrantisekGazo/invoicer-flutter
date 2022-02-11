@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:invoicer/src/data/dao/supplier.dart';
 import 'package:invoicer/src/data/di.dart';
 import 'package:invoicer/src/data/model/invoice.dart';
@@ -16,7 +17,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _loading = ValueNotifier(false);
-  final _logs = ValueNotifier('');
+  final _number = TextEditingController(text: '2022002');
+  final _dateIssue = ValueNotifier(DateTime.now());
+  final _dateDue = ValueNotifier(
+    DateTime(DateTime.now().year, DateTime.now().month + 1, 0),
+  );
   late final SupplierDao _supplierDao;
   late final FileService _fileService;
   late final PdfBuilderService _pdfBuilderService;
@@ -37,34 +42,52 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ValueListenableBuilder<bool>(
         valueListenable: _loading,
-        builder: (context, loading, _) => Stack(
+        builder: (context, loading, _) => Column(
           children: [
-            if (loading)
-              const Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: LinearProgressIndicator(),
-              ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: ValueListenableBuilder<String>(
-                valueListenable: _logs,
-                builder: (context, logs, _) => Text(logs),
-              ),
+            SizedBox(
+              height: 4,
+              child: loading ? const LinearProgressIndicator() : null,
             ),
-            Positioned.fill(
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: loading ? null : _run,
-                  child: const Text('Run'),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          child: TextField(
+                            controller: _number,
+                            decoration: const InputDecoration(
+                              label: Text('Number'),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        DatePickerItem(label: 'Issued', date: _dateIssue),
+                        const SizedBox(width: 16),
+                        DatePickerItem(label: 'Due', date: _dateDue),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
           ],
         ),
+      ),
+      floatingActionButton: ValueListenableBuilder<bool>(
+        valueListenable: _loading,
+        builder: (context, loading, _) => loading
+            ? const SizedBox.shrink()
+            : FloatingActionButton(
+                child: const Icon(Icons.arrow_circle_down),
+                onPressed: _run,
+              ),
       ),
     );
   }
@@ -74,7 +97,7 @@ class _HomePageState extends State<HomePage> {
 
     final supplier = await _supplierDao.get();
     final invoice = Invoice(
-      number: '20XX00Y',
+      number: _number.text,
       supplier: supplier,
       client: supplier.clients.last,
       items: const [
@@ -82,19 +105,18 @@ class _HomePageState extends State<HomePage> {
           name: 'Application development',
           amount: 1,
           unit: 'pc',
-          price: 1000,
+          price: 4620,
         ),
       ],
-      issueDate: DateTime(2020, 8, 15),
-      deliveryDate: DateTime(2020, 8, 15),
-      dueDate: DateTime(2020, 8, 30),
+      issueDate: _dateIssue.value,
+      deliveryDate: _dateDue.value,
+      dueDate: _dateDue.value,
     );
     final pdf = await _pdfBuilderService.build(invoice);
 
     final dir = _fileService.mainDirectory.value!;
     final file = File('${dir.path}/invoices/example.pdf');
     await file.writeAsBytes(await pdf.save());
-    _logs.value = 'file: ${file.path}';
 
     _loading.value = false;
   }
@@ -102,6 +124,58 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _loading.dispose();
+    _number.dispose();
+    _dateIssue.dispose();
+    _dateDue.dispose();
     super.dispose();
+  }
+}
+
+class DatePickerItem extends StatelessWidget {
+  static final _dateFormatter = DateFormat('dd/MM/yyyy');
+
+  final String label;
+  final ValueNotifier<DateTime> date;
+
+  const DatePickerItem({
+    Key? key,
+    required this.label,
+    required this.date,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(label),
+            const SizedBox(width: 4),
+            const Icon(Icons.today),
+            const SizedBox(width: 4),
+            ValueListenableBuilder<DateTime>(
+              valueListenable: date,
+              builder: (context, dateValue, _) => Text(
+                _dateFormatter.format(dateValue),
+              ),
+            ),
+          ],
+        ),
+      ),
+      onTap: () async {
+        final value = date.value;
+        final selected = await showDatePicker(
+          context: context,
+          initialDate: value,
+          firstDate: value.add(const Duration(days: -30)),
+          lastDate: value.add(const Duration(days: 30)),
+        );
+        if (selected != null) {
+          date.value = selected;
+        }
+      },
+    );
   }
 }
