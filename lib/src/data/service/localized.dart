@@ -1,8 +1,16 @@
+///
+/// Provides localized data.
+///
 abstract class LocalizedService {
-  LocalizedDocument getLocalizedDoc(bool en);
+  /// Get translations for an invoice.
+  /// [en] If true then texts are in English, otherwise in Slovak.
+  LocalizedInvoice getLocalizedInvoice(bool en);
 }
 
-abstract class LocalizedDocument {
+///
+/// Invoice translations.
+///
+abstract class LocalizedInvoice {
   String get invoice;
 
   String get supplier;

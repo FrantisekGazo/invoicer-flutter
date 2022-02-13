@@ -42,7 +42,7 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
     final signature = _fileService.getFile(invoice.supplier.signaturePath);
     final signatureBytes = await signature.readAsBytes();
     final localized =
-        _localizedService.getLocalizedDoc(invoice.client.isForeign);
+        _localizedService.getLocalizedInvoice(invoice.client.isForeign);
 
     return Document(theme: theme)
       ..addPage(
@@ -118,7 +118,7 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
 }
 
 class InvoiceTitle extends StatelessWidget {
-  final LocalizedDocument localized;
+  final LocalizedInvoice localized;
   final String number;
 
   InvoiceTitle({
@@ -148,7 +148,7 @@ class InvoiceTitle extends StatelessWidget {
 }
 
 class SupplierContainer extends StatelessWidget {
-  final LocalizedDocument localized;
+  final LocalizedInvoice localized;
   final Supplier supplier;
   final Client client;
 
@@ -200,7 +200,7 @@ class SupplierContainer extends StatelessWidget {
 }
 
 class ClientContainer extends StatelessWidget {
-  final LocalizedDocument localized;
+  final LocalizedInvoice localized;
   final Client client;
 
   ClientContainer({
@@ -272,7 +272,7 @@ class ClientContainer extends StatelessWidget {
 }
 
 class InvoiceDatesContainer extends StatelessWidget {
-  final LocalizedDocument localized;
+  final LocalizedInvoice localized;
   final Invoice invoice;
   static final _dateFormatter = DateFormat('dd.MM.yyyy');
 
@@ -307,7 +307,7 @@ class InvoiceDatesContainer extends StatelessWidget {
 }
 
 class PaymentInfoContainer extends StatelessWidget {
-  final LocalizedDocument localized;
+  final LocalizedInvoice localized;
   final Invoice invoice;
 
   PaymentInfoContainer({
@@ -353,7 +353,7 @@ class PaymentInfoContainer extends StatelessWidget {
 }
 
 class SignatureContainer extends StatelessWidget {
-  final LocalizedDocument localized;
+  final LocalizedInvoice localized;
 
   /// Signature image file content.
   final Uint8List signature;
@@ -394,7 +394,7 @@ class SignatureContainer extends StatelessWidget {
 }
 
 class InvoiceTable extends StatelessWidget {
-  final LocalizedDocument localized;
+  final LocalizedInvoice localized;
   final Invoice invoice;
 
   InvoiceTable({

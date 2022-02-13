@@ -2,12 +2,12 @@ import 'package:invoicer/src/data/service/localized.dart';
 
 class LocalizedServiceImpl implements LocalizedService {
   @override
-  LocalizedDocument getLocalizedDoc(bool en) {
+  LocalizedInvoice getLocalizedInvoice(bool en) {
     return en ? const _EnLocalizedDocument() : const _SkLocalizedDocument();
   }
 }
 
-class _EnLocalizedDocument implements LocalizedDocument {
+class _EnLocalizedDocument implements LocalizedInvoice {
   const _EnLocalizedDocument();
 
   @override
@@ -114,7 +114,7 @@ class _EnLocalizedDocument implements LocalizedDocument {
   String get unitHour => 'h';
 }
 
-class _SkLocalizedDocument implements LocalizedDocument {
+class _SkLocalizedDocument implements LocalizedInvoice {
   const _SkLocalizedDocument();
 
   @override
