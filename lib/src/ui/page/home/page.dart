@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:invoicer/src/data/dao/supplier.dart';
 import 'package:invoicer/src/data/di.dart';
@@ -22,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   final _dateDue = ValueNotifier(
     DateTime(DateTime.now().year, DateTime.now().month + 1, 0),
   );
+  final _items = ValueNotifier(const <InvoiceItemModel>[]);
   late final SupplierDao _supplierDao;
   late final FileService _fileService;
   late final PdfBuilderService _pdfBuilderService;
@@ -31,11 +34,29 @@ class _HomePageState extends State<HomePage> {
     _supplierDao = inject();
     _fileService = inject();
     _pdfBuilderService = inject();
+    _items.value = [
+      InvoiceItemModel(name: 'Application development'),
+    ];
     super.initState();
   }
 
   @override
+  void dispose() {
+    _loading.dispose();
+    _number.dispose();
+    _dateIssue.dispose();
+    _dateDue.dispose();
+    for (final item in _items.value) {
+      item.onDispose();
+    }
+    _items.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Invoicer'),
@@ -73,6 +94,19 @@ class _HomePageState extends State<HomePage> {
                         DatePickerItem(label: 'Due', date: _dateDue),
                       ],
                     ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Items:',
+                      style: theme.textTheme.subtitle1,
+                    ),
+                    ValueListenableBuilder<List<InvoiceItemModel>>(
+                      valueListenable: _items,
+                      builder: (context, items, _) => Column(
+                        children: items
+                            .map((it) => InvoiceItemView(model: it))
+                            .toList(),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -100,14 +134,16 @@ class _HomePageState extends State<HomePage> {
       number: _number.text,
       supplier: supplier,
       client: supplier.clients.last,
-      items: const [
-        InvoiceItem(
-          name: 'Application development',
-          amount: 1,
-          unit: 'pc',
-          price: 4620,
-        ),
-      ],
+      items: _items.value
+          .map(
+            (it) => InvoiceItem(
+              name: it.name.text,
+              amount: it.quantity.value,
+              unit: 'pc',
+              price: double.tryParse(it.price.text) ?? 0,
+            ),
+          )
+          .toList(),
       issueDate: _dateIssue.value,
       deliveryDate: _dateDue.value,
       dueDate: _dateDue.value,
@@ -120,14 +156,54 @@ class _HomePageState extends State<HomePage> {
 
     _loading.value = false;
   }
+}
+
+class InvoiceItemModel implements Disposable {
+  final TextEditingController name;
+  final ValueNotifier<double> quantity;
+  final TextEditingController price;
+
+  InvoiceItemModel({
+    String? name,
+    double? quantity,
+    double? price,
+  })  : this.name = TextEditingController(text: name),
+        this.quantity = ValueNotifier(quantity ?? 1.0),
+        this.price = TextEditingController(text: price?.toString());
 
   @override
-  void dispose() {
-    _loading.dispose();
-    _number.dispose();
-    _dateIssue.dispose();
-    _dateDue.dispose();
-    super.dispose();
+  FutureOr onDispose() async {
+    name.dispose();
+    quantity.dispose();
+    price.dispose();
+  }
+}
+
+class InvoiceItemView extends StatelessWidget {
+  final InvoiceItemModel model;
+
+  const InvoiceItemView({
+    Key? key,
+    required this.model,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(controller: model.name),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 100,
+          child: TextField(
+            controller: model.price,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+        ),
+      ],
+    );
   }
 }
 
