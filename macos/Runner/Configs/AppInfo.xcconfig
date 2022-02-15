@@ -8,7 +8,7 @@
 PRODUCT_NAME = invoicer
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = eu.invoicer.app
+PRODUCT_BUNDLE_IDENTIFIER = eu.f3rog.invoicer
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2022 eu.invoicer. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2022 eu.f3rog. All rights reserved.
