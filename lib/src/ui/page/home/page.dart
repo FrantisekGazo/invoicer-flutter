@@ -59,7 +59,14 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Invoicer'),
+        title: ValueListenableBuilder<Directory?>(
+          valueListenable: _fileService.mainDirectory,
+          builder: (context, dir, _) => Text(
+            dir?.path ?? '',
+            style: theme.textTheme.subtitle1,
+            overflow: TextOverflow.fade,
+          ),
+        ),
       ),
       body: ValueListenableBuilder<bool>(
         valueListenable: _loading,
@@ -76,8 +83,9 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.end,
+                      spacing: 16,
                       children: [
                         SizedBox(
                           width: 120,
@@ -88,9 +96,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16),
                         DatePickerItem(label: 'Issued', date: _dateIssue),
-                        const SizedBox(width: 16),
                         DatePickerItem(label: 'Due', date: _dateDue),
                       ],
                     ),
