@@ -135,9 +135,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> _run() async {
     _loading.value = true;
 
+    final number = _number.text;
     final supplier = await _supplierDao.get();
     final invoice = Invoice(
-      number: _number.text,
+      number: number,
       supplier: supplier,
       client: supplier.clients.last,
       items: _items.value
@@ -157,7 +158,7 @@ class _HomePageState extends State<HomePage> {
     final pdf = await _pdfBuilderService.build(invoice);
 
     final dir = _fileService.mainDirectory.value!;
-    final file = File('${dir.path}/invoices/example.pdf');
+    final file = File('${dir.path}/invoices/$number.pdf');
     await file.writeAsBytes(await pdf.save());
 
     _loading.value = false;
