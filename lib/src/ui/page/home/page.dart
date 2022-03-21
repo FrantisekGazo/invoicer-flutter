@@ -176,7 +176,7 @@ class InvoiceItemModel implements Disposable {
     double? price,
   })  : this.name = TextEditingController(text: name),
         this.quantity = ValueNotifier(quantity ?? 1.0),
-        this.price = TextEditingController(text: price?.toString());
+        this.price = TextEditingController(text: price?.toString() ?? '100');
 
   @override
   FutureOr onDispose() async {
