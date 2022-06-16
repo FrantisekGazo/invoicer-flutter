@@ -4,14 +4,14 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^2.15.0
-  flutter: ^2.8.0
+  sdk: ^2.16.0
+  flutter: ^2.10.0
 
 dependencies:
   flutter:
     sdk: flutter
-  file_picker: 4.3.3
-  pdf: 3.6.5
+  file_picker: 4.6.1
+  pdf: 3.8.1
   get_it: 7.2.0
   intl: 0.17.0
 
