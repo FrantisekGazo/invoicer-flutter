@@ -34,7 +34,7 @@ class NavigationServiceImpl implements NavigationService {
   }
 
   @override
-  FutureOr onDispose() async {
+  Future<void> onDispose() async {
     _initialized.dispose();
   }
 }
