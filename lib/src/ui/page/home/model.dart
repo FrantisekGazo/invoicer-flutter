@@ -119,7 +119,7 @@ class HomePageModelImpl implements HomePageModel {
       _dateDue.value =
           DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
       _items.value = [
-        InvoiceItemModel(name: 'Application development 1'),
+        InvoiceItemModel(name: 'Application development'),
       ];
 
       await Future.delayed(const Duration(milliseconds: 500));

@@ -245,8 +245,8 @@ class DatePickerItem extends StatelessWidget {
         final selected = await showDatePicker(
           context: context,
           initialDate: value,
-          firstDate: value.add(const Duration(days: -30)),
-          lastDate: value.add(const Duration(days: 30)),
+          firstDate: value.add(const Duration(days: -365)),
+          lastDate: value.add(const Duration(days: 365)),
         );
         if (selected != null) {
           date.value = selected;
