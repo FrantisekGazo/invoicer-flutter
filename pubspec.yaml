@@ -10,13 +10,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  file_picker: 5.2.0+1
-  pdf: 3.8.3
-  get_it: 7.2.0
-  intl: 0.17.0
-  mutex: 3.0.0
-  collection: 1.16.0
-  shared_preferences: 2.0.15
+  file_picker: 5.3.0
+  pdf: 3.10.3
+  get_it: 7.6.0
+  intl: 0.18.1
+  mutex: 3.0.1
+  collection: 1.17.1
+  meta: 1.9.1
+  shared_preferences: 2.1.1
 
 dev_dependencies:
   flutter_lints: ^2.0.1

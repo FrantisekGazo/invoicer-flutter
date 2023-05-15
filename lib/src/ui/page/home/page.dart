@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
             valueListenable: _model.outputDir,
             builder: (context, dir, _) => Text(
               dir?.path ?? '',
-              style: theme.textTheme.subtitle1,
+              style: theme.textTheme.titleSmall,
               overflow: TextOverflow.fade,
             ),
           ),
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 24),
                       Text(
                         'Items:',
-                        style: theme.textTheme.subtitle1,
+                        style: theme.textTheme.titleMedium,
                       ),
                       ValueListenableBuilder<List<InvoiceItemModel>>(
                         valueListenable: _model.items,
