@@ -11,9 +11,13 @@ abstract class FileService extends Disposable {
   /// Main directory where app stores document data.
   ValueListenable<Directory?> get mainDirectory;
 
-  /// Select main directory.
+  /// Set main directory (Use previously selected if any).
   /// Returns true on success
-  Future<bool> selectMainDirectory();
+  Future<bool> setupMainDirectory();
+
+  /// Reset main directory.
+  /// Returns true on success
+  Future<bool> resetMainDirectory();
 
   /// Get a file from the main directory.
   File getFile(String relativePath);

@@ -4,40 +4,38 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invoicer/src/data/service/file.dart';
+import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FileServiceImpl implements FileService {
-  static const _spKeyMainPath = 'main-path';
+  static const _spKeyMainDirBookmark = 'main_dir_bookmark';
 
+  final _secureBookmarks = SecureBookmarks();
   final _mainDir = ValueNotifier<Directory?>(null);
 
   @override
   ValueListenable<Directory?> get mainDirectory => _mainDir;
 
   @override
-  Future<bool> selectMainDirectory() async {
-    final previous = await _getInitialDir();
-    final path = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'Invoicer directory',
-      initialDirectory: previous?.path,
-    );
-    if (path != null) {
-      await _setInitialDir(path);
-      _mainDir.value = Directory(path);
+  Future<bool> resetMainDirectory() async {
+    final mainDir = await _chooseMainDir();
+    if (mainDir != null) {
+      _mainDir.value = mainDir;
       return true;
     }
+
     return false;
   }
 
-  Future<Directory?> _getInitialDir() async {
-    final sp = await SharedPreferences.getInstance();
-    final path = sp.getString(_spKeyMainPath);
-    return (path != null)? Directory(path):null;
-  }
+  @override
+  Future<bool> setupMainDirectory() async {
+    final previousMainDir = await _getPreviouslyUsedMainDir();
+    if (previousMainDir != null) {
+      _mainDir.value = previousMainDir;
+      return true;
+    }
 
-  Future<void> _setInitialDir(String path) async {
-    final sp = await SharedPreferences.getInstance();
-    sp.setString(_spKeyMainPath, path);
+    return await resetMainDirectory();
   }
 
   @override
@@ -50,7 +48,39 @@ class FileServiceImpl implements FileService {
   }
 
   @override
-  FutureOr onDispose() async {
+  Future<void> onDispose() async {
+    final mainDir = _mainDir.value;
+    if (mainDir != null) {
+      await _secureBookmarks.stopAccessingSecurityScopedResource(mainDir);
+    }
     _mainDir.dispose();
+  }
+
+  Future<Directory?> _getPreviouslyUsedMainDir() async {
+    final sp = await SharedPreferences.getInstance();
+    final storedBookmark = sp.getString(_spKeyMainDirBookmark);
+    if (storedBookmark == null) {
+      return null;
+    }
+
+    final resolvedFile = await _secureBookmarks.resolveBookmark(storedBookmark);
+    await _secureBookmarks.startAccessingSecurityScopedResource(resolvedFile);
+    return Directory(resolvedFile.path);
+  }
+
+  Future<Directory?> _chooseMainDir() async {
+    final path = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Invoicer directory',
+    );
+    if (path == null) {
+      return null;
+    }
+    final mainDir = Directory(path);
+
+    final bookmark = await _secureBookmarks.bookmark(mainDir);
+    final sp = await SharedPreferences.getInstance();
+    sp.setString(_spKeyMainDirBookmark, bookmark);
+
+    return mainDir;
   }
 }

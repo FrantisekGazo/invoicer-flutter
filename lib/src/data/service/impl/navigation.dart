@@ -27,10 +27,10 @@ class NavigationServiceImpl implements NavigationService {
 
   @override
   Future<void> initializedApp() async {
-    var selected = false;
+    var done = false;
     do {
-      selected = await _fileService.selectMainDirectory();
-    } while (!selected);
+      done = await _fileService.setupMainDirectory();
+    } while (!done);
   }
 
   @override

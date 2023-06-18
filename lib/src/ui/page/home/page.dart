@@ -42,12 +42,23 @@ class _HomePageState extends State<HomePage> {
       valueListenable: _model.state,
       builder: (context, state, _) => Scaffold(
         appBar: AppBar(
-          title: ValueListenableBuilder<Directory?>(
-            valueListenable: _model.outputDir,
-            builder: (context, dir, _) => Text(
-              dir?.path ?? '',
-              style: theme.textTheme.titleSmall,
-              overflow: TextOverflow.fade,
+          title: InkWell(
+            onTap: _model.resetMainDir,
+            child: Row(
+              children: [
+                const Icon(Icons.folder_copy_outlined),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ValueListenableBuilder<Directory?>(
+                    valueListenable: _model.outputDir,
+                    builder: (context, dir, _) => Text(
+                      dir?.path ?? '',
+                      style: theme.textTheme.titleSmall,
+                      overflow: TextOverflow.fade,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

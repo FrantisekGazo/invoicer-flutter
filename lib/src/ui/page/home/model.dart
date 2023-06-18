@@ -42,6 +42,8 @@ abstract class HomePageModel {
   Future<bool> createInvoice();
 
   void dispose();
+
+  void resetMainDir();
 }
 
 class HomePageModelImpl implements HomePageModel {
@@ -178,6 +180,11 @@ class HomePageModelImpl implements HomePageModel {
       _state.value = InvoiceDataState.ready;
       return true;
     });
+  }
+
+  @override
+  void resetMainDir() {
+    _fileService.resetMainDirectory();
   }
 
   @override
