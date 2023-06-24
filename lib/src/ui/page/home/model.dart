@@ -120,9 +120,9 @@ class HomePageModelImpl implements HomePageModel {
       _client.value = supplier.clients
           .lastWhere((it) => it.name.toLowerCase().contains('ventrata'));
       _resetInvoiceNumber();
-      _dateIssued.value = DateTime.now();
-      _dateDue.value =
-          DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+      final now = DateTime.now();
+      _dateIssued.value = now;
+      _dateDue.value = DateTime(now.year, now.month + 1, 0);
       _items.value = [
         InvoiceItemModel(name: 'Application development'),
       ];
