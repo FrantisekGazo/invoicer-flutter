@@ -39,13 +39,13 @@ abstract class HomePageModel {
 
   ValueNotifier<List<InvoiceItemModel>> get items;
 
-  Future<bool> init();
-
   Future<bool> submit();
 
   void dispose();
 
   void resetMainDir();
+
+  void reload();
 
   void openInvoicesDir();
 }
@@ -101,8 +101,8 @@ class HomePageModelImpl implements HomePageModel {
   ValueNotifier<List<InvoiceItemModel>> get items => _items;
 
   @override
-  Future<bool> init() {
-    return _stateMutex.protect(() async {
+  void reload() {
+    _stateMutex.protect(() async {
       _state.value = InvoiceDataState.initializing;
 
       final outDir = outputDir.value;
@@ -134,21 +134,6 @@ class HomePageModelImpl implements HomePageModel {
       _state.value = InvoiceDataState.ready;
       return true;
     });
-  }
-
-  void _resetInvoiceNumber() {
-    final invoices = _fileService.getInvoiceFiles();
-    final lastNumber = invoices
-        .map((it) {
-          final id = it.path.split('/').last.replaceFirst('.pdf', '');
-          return int.tryParse(id);
-        })
-        .whereNotNull()
-        .sorted((a, b) => a - b)
-        .lastOrNull;
-    final minNumber = DateTime.now().year * 1000;
-    final newNumber = math.max(lastNumber ?? 0, minNumber) + 1;
-    _invoiceNumber.value = TextEditingValue(text: newNumber.toString());
   }
 
   @override
@@ -223,5 +208,20 @@ class HomePageModelImpl implements HomePageModel {
       item.onDispose();
     }
     _items.dispose();
+  }
+
+  void _resetInvoiceNumber() {
+    final invoices = _fileService.getInvoiceFiles();
+    final lastNumber = invoices
+        .map((it) {
+          final id = it.path.split('/').last.replaceFirst('.pdf', '');
+          return int.tryParse(id);
+        })
+        .whereNotNull()
+        .sorted((a, b) => a - b)
+        .lastOrNull;
+    final minNumber = DateTime.now().year * 1000;
+    final newNumber = math.max(lastNumber ?? 0, minNumber) + 1;
+    _invoiceNumber.value = TextEditingValue(text: newNumber.toString());
   }
 }

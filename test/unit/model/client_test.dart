@@ -8,6 +8,7 @@ void main() {
     group('compare', () {
       test('when all have order', () async {
         const c1 = Client(
+          id: '1',
           order: 2,
           name: 'foo',
           address: [],
@@ -15,6 +16,7 @@ void main() {
           lang: Language.sk,
         );
         const c2 = Client(
+          id: '2',
           order: 0,
           name: 'foo',
           address: [],
@@ -22,6 +24,7 @@ void main() {
           lang: Language.sk,
         );
         const c3 = Client(
+          id: '3',
           order: 10,
           name: 'foo',
           address: [],
@@ -29,6 +32,7 @@ void main() {
           lang: Language.sk,
         );
         const c4 = Client(
+          id: '4',
           order: -2,
           name: 'foo',
           address: [],
@@ -44,24 +48,28 @@ void main() {
 
       test('when none have order', () async {
         const c1 = Client(
+          id: '1',
           name: 'Aaa',
           address: [],
           projects: [],
           lang: Language.sk,
         );
         const c2 = Client(
+          id: '2',
           name: 'Cccc',
           address: [],
           projects: [],
           lang: Language.sk,
         );
         const c3 = Client(
+          id: '3',
           name: 'Baaa',
           address: [],
           projects: [],
           lang: Language.sk,
         );
         const c4 = Client(
+          id: '4',
           name: 'Bbbb',
           address: [],
           projects: [],
@@ -76,6 +84,7 @@ void main() {
 
       test('when some have order', () async {
         const c1 = Client(
+          id: '1',
           order: 10,
           name: 'Aaa',
           address: [],
@@ -83,12 +92,14 @@ void main() {
           lang: Language.sk,
         );
         const c2 = Client(
+          id: '2',
           name: 'Cccc',
           address: [],
           projects: [],
           lang: Language.sk,
         );
         const c3 = Client(
+          id: '3',
           order: -1,
           name: 'Baaa',
           address: [],
@@ -96,6 +107,7 @@ void main() {
           lang: Language.sk,
         );
         const c4 = Client(
+          id: '4',
           name: 'Bbbb',
           address: [],
           projects: [],

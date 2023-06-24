@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
       inject(),
       inject(),
     );
-    _model.init();
+    _model.reload();
     super.initState();
   }
 
@@ -46,8 +46,6 @@ class _HomePageState extends State<HomePage> {
             onTap: _model.resetMainDir,
             child: Row(
               children: [
-                const Icon(Icons.sync),
-                const SizedBox(width: 8),
                 Expanded(
                   child: ValueListenableBuilder<Directory?>(
                     valueListenable: _model.outputDir,
@@ -58,10 +56,16 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
+                const Icon(Icons.edit),
               ],
             ),
           ),
           actions: [
+            IconButton(
+              onPressed: _model.reload,
+              icon: const Icon(Icons.sync),
+            ),
             IconButton(
               onPressed: _model.openInvoicesDir,
               icon: const Icon(Icons.folder_copy_outlined),
@@ -87,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                     const Text('Initialization failed!'),
                     const SizedBox(height: 8),
                     ElevatedButton(
-                      onPressed: _model.init,
+                      onPressed: _model.reload,
                       child: const Text('Try again'),
                     ),
                   ],
