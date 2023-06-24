@@ -38,13 +38,43 @@ class FileServiceImpl implements FileService {
     return await resetMainDirectory();
   }
 
-  @override
-  File getFile(String relativePath) {
-    final mainDirPath = _mainDir.value?.path;
-    if (mainDirPath == null) {
+  Directory get _requireMainDir {
+    final dir = _mainDir.value;
+    if (dir == null) {
       throw StateError('Main directory not setup');
     }
+    return dir;
+  }
+
+  Directory get _requireInvoicesDir {
+    final mainDirPath = _requireMainDir.path;
+    final dir = Directory('$mainDirPath/invoices/');
+    if (!dir.existsSync()) {
+      dir.create();
+    }
+    return dir;
+  }
+
+  @override
+  File getFile(String relativePath) {
+    final mainDirPath = _requireMainDir.path;
     return File('$mainDirPath/$relativePath');
+  }
+
+  @override
+  List<File> getInvoiceFiles() {
+    final dir = _requireInvoicesDir;
+    return dir
+        .listSync()
+        .where((it) => it is File && it.path.endsWith('.pdf'))
+        .cast<File>()
+        .toList();
+  }
+
+  @override
+  File createInvoiceFiles(String invoiceId) {
+    final dirPath = _requireInvoicesDir.path;
+    return File('$dirPath/$invoiceId.pdf');
   }
 
   @override

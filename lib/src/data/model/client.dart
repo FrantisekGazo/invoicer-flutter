@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 
 @immutable
 class Client implements Comparable<Client> {
+  final String id;
   final String name;
   final List<String> address;
   final String? ico;
@@ -20,6 +21,7 @@ class Client implements Comparable<Client> {
   final Language lang;
 
   const Client({
+    required this.id,
     required this.name,
     required this.address,
     this.ico,
@@ -32,6 +34,7 @@ class Client implements Comparable<Client> {
 
   Client.formJson(Map<String, dynamic> data)
       : this(
+          id: data['id'],
           name: data['name'],
           address: (data['address'] as List).cast<String>(),
           ico: data['ico'],
@@ -68,6 +71,7 @@ class Client implements Comparable<Client> {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'address': address,
       'ico': ico,

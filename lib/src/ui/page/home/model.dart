@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:math' as math;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invoicer/src/data/dao/supplier.dart';
@@ -39,7 +41,7 @@ abstract class HomePageModel {
 
   Future<bool> init();
 
-  Future<bool> createInvoice();
+  Future<bool> submit();
 
   void dispose();
 
@@ -115,8 +117,9 @@ class HomePageModelImpl implements HomePageModel {
         return false;
       }
 
-      _client.value = supplier.clients.first;
-      _invoiceNumber.value = const TextEditingValue(text: '2022004-TEST');
+      _client.value = supplier.clients
+          .lastWhere((it) => it.name.toLowerCase().contains('ventrata'));
+      _resetInvoiceNumber();
       _dateIssued.value = DateTime.now();
       _dateDue.value =
           DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
@@ -131,8 +134,23 @@ class HomePageModelImpl implements HomePageModel {
     });
   }
 
+  void _resetInvoiceNumber() {
+    final invoices = _fileService.getInvoiceFiles();
+    final lastNumber = invoices
+        .map((it) {
+          final id = it.path.split('/').last.replaceFirst('.pdf', '');
+          return int.tryParse(id);
+        })
+        .whereNotNull()
+        .sorted((a, b) => a - b)
+        .lastOrNull;
+    final minNumber = DateTime.now().year * 1000;
+    final newNumber = math.max(lastNumber ?? 0, minNumber) + 1;
+    _invoiceNumber.value = TextEditingValue(text: newNumber.toString());
+  }
+
   @override
-  Future<bool> createInvoice() {
+  Future<bool> submit() {
     return _stateMutex.protect(() async {
       if (_state.value != InvoiceDataState.ready) {
         return false;
@@ -171,10 +189,10 @@ class HomePageModelImpl implements HomePageModel {
       );
       final pdf = await _pdfBuilderService.build(invoice);
 
-      final dir = _fileService.mainDirectory.value!;
-      final file = File('${dir.path}/invoices/$number.pdf');
+      final file = _fileService.createInvoiceFiles(number);
       await file.writeAsBytes(await pdf.save());
 
+      _resetInvoiceNumber();
       await Future.delayed(const Duration(milliseconds: 500));
 
       _state.value = InvoiceDataState.ready;

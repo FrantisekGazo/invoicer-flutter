@@ -19,6 +19,12 @@ abstract class FileService extends Disposable {
   /// Returns true on success
   Future<bool> resetMainDirectory();
 
+  /// Get all available invoice files.
+  List<File> getInvoiceFiles();
+
+  /// Create a new file for an invoice with given ID.
+  File createInvoiceFiles(String invoiceId);
+
   /// Get a file from the main directory.
   File getFile(String relativePath);
 }

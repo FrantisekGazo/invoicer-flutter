@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
         floatingActionButton: (state == InvoiceDataState.ready)
             ? FloatingActionButton(
                 onPressed: () async {
-                  final success = await _model.createInvoice();
+                  final success = await _model.submit();
                   if (mounted) {
                     final snackBar = SnackBar(
                       content: Text(
