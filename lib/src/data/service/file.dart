@@ -27,4 +27,7 @@ abstract class FileService extends Disposable {
 
   /// Get a file from the main directory.
   File getFile(String relativePath);
+
+  /// Open directory with invoices.
+  void openInvoicesDir();
 }

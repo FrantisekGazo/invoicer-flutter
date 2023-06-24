@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
             onTap: _model.resetMainDir,
             child: Row(
               children: [
-                const Icon(Icons.folder_copy_outlined),
+                const Icon(Icons.sync),
                 const SizedBox(width: 8),
                 Expanded(
                   child: ValueListenableBuilder<Directory?>(
@@ -61,6 +61,12 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+          actions: [
+            IconButton(
+              onPressed: _model.openInvoicesDir,
+              icon: const Icon(Icons.folder_copy_outlined),
+            ),
+          ],
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

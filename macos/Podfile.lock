@@ -2,6 +2,8 @@ PODS:
   - FlutterMacOS (1.0.0)
   - macos_secure_bookmarks (0.0.3):
     - FlutterMacOS
+  - open_dir_macos (0.0.1):
+    - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -9,6 +11,7 @@ PODS:
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
   - macos_secure_bookmarks (from `Flutter/ephemeral/.symlinks/plugins/macos_secure_bookmarks/macos`)
+  - open_dir_macos (from `Flutter/ephemeral/.symlinks/plugins/open_dir_macos/macos`)
   - shared_preferences_foundation (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 EXTERNAL SOURCES:
@@ -16,12 +19,15 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral
   macos_secure_bookmarks:
     :path: Flutter/ephemeral/.symlinks/plugins/macos_secure_bookmarks/macos
+  open_dir_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/open_dir_macos/macos
   shared_preferences_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin
 
 SPEC CHECKSUMS:
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   macos_secure_bookmarks: cff041c4b377fa00941bb901aaec4d27fac5edf2
+  open_dir_macos: 9649018f88e71eb9fb8aa3d95caec30a73c08c5b
   shared_preferences_foundation: e2dae3258e06f44cc55f49d42024fd8dd03c590c
 
 PODFILE CHECKSUM: 353c8bcc5d5b0994e508d035b5431cfe18c1dea7

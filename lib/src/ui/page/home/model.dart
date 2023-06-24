@@ -46,6 +46,8 @@ abstract class HomePageModel {
   void dispose();
 
   void resetMainDir();
+
+  void openInvoicesDir();
 }
 
 class HomePageModelImpl implements HomePageModel {
@@ -203,6 +205,11 @@ class HomePageModelImpl implements HomePageModel {
   @override
   void resetMainDir() {
     _fileService.resetMainDirectory();
+  }
+
+  @override
+  void openInvoicesDir() {
+    _fileService.openInvoicesDir();
   }
 
   @override

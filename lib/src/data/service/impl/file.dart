@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
+import 'package:open_dir/open_dir.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FileServiceImpl implements FileService {
@@ -84,6 +85,12 @@ class FileServiceImpl implements FileService {
       await _secureBookmarks.stopAccessingSecurityScopedResource(mainDir);
     }
     _mainDir.dispose();
+  }
+
+  @override
+  void openInvoicesDir() {
+    final openDirPlugin = OpenDir();
+    openDirPlugin.openNativeDir(path: _requireInvoicesDir.path);
   }
 
   Future<Directory?> _getPreviouslyUsedMainDir() async {
