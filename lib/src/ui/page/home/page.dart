@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:invoicer/src/data/di.dart';
+import 'package:invoicer/src/data/model/client.dart';
+import 'package:invoicer/src/data/model/supplier.dart';
 import 'package:invoicer/src/ui/page/home/model.dart';
 
 class HomePage extends StatefulWidget {
@@ -72,9 +75,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.max,
+        body: ListView(
           children: [
             SizedBox(
               height: 4,
@@ -106,19 +107,40 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        spacing: 16,
-                        children: [
-                          SizedBox(
-                            width: 120,
-                            child: TextField(
-                              controller: _model.invoiceNumber,
-                              decoration: const InputDecoration(
-                                label: Text('Number'),
-                              ),
-                            ),
+                      SizedBox(
+                        width: 120,
+                        child: TextField(
+                          controller: _model.invoiceNumber,
+                          decoration: const InputDecoration(
+                            label: Text('Number'),
                           ),
+                        ),
+                      ),
+                      const Divider(height: 16),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.start,
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [
+                          ValueListenableBuilder<Supplier?>(
+                            valueListenable: _model.supplier,
+                            builder: (context, supplier, _) =>
+                                (supplier != null)
+                                    ? SupplierInfoItem(supplier: supplier)
+                                    : const SizedBox.shrink(),
+                          ),
+                          ClientPickerItem(
+                            clients: _model.clients,
+                            selected: _model.client,
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 16),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.start,
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [
                           DatePickerItem(
                             label: 'Issued',
                             date: _model.dateIssued,
@@ -129,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const Divider(height: 24),
                       Text(
                         'Items:',
                         style: theme.textTheme.titleMedium,
@@ -273,6 +295,114 @@ class DatePickerItem extends StatelessWidget {
           date.value = selected;
         }
       },
+    );
+  }
+}
+
+class ClientPickerItem extends StatelessWidget {
+  final ValueNotifier<Client?> selected;
+  final ValueListenable<List<Client>> clients;
+
+  const ClientPickerItem({
+    super.key,
+    required this.selected,
+    required this.clients,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<List<Client>>(
+      valueListenable: clients,
+      builder: (context, all, _) => ValueListenableBuilder<Client?>(
+        valueListenable: selected,
+        builder: (context, selectedClient, _) {
+          final theme = Theme.of(context);
+          final address = selectedClient?.address;
+          final dic = selectedClient?.dic;
+          final icdph = selectedClient?.icdph;
+          final ico = selectedClient?.ico;
+
+          return DefaultTextStyle.merge(
+            style: theme.textTheme.bodySmall,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Client:'),
+                DropdownButton<Client>(
+                  items: all
+                      .map(
+                        (it) => DropdownMenuItem<Client>(
+                          value: it,
+                          child: Text(it.name),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    selected.value = value;
+                  },
+                  value: selectedClient,
+                ),
+                if (address != null) Text(address.join('\n')),
+                const SizedBox(height: 8),
+                if (ico != null) Text('IČO: $ico'),
+                if (dic != null) Text('DIČ: $dic'),
+                if (icdph != null) Text('IČ DPH: $icdph'),
+                const SizedBox(height: 8),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class SupplierInfoItem extends StatelessWidget {
+  final Supplier supplier;
+
+  const SupplierInfoItem({
+    super.key,
+    required this.supplier,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final email = supplier.email;
+    final phone = supplier.phone;
+    final dic = supplier.dic;
+    final icdph = supplier.icdph;
+    final ico = supplier.ico;
+    final bankAccount = supplier.bankAccount;
+
+    return DefaultTextStyle.merge(
+      style: theme.textTheme.bodySmall,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Supplier:'),
+          const SizedBox(height: 16),
+          Text(
+            supplier.name,
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 16),
+          Text(supplier.address.join('\n')),
+          const SizedBox(height: 8),
+          Text('IČO: $ico', style: theme.textTheme.bodyMedium),
+          if (dic != null) Text('DIČ: $dic'),
+          if (icdph != null) Text('IČ DPH: $icdph'),
+          const SizedBox(height: 8),
+          if (email != null) Text('E-mail: $email'),
+          if (phone != null) Text('Phone: $phone'),
+          const SizedBox(height: 8),
+          const Text('Bank account:'),
+          Text(bankAccount.iban, style: theme.textTheme.bodyMedium),
+          Text('SWIFT: ${bankAccount.swift}'),
+          const SizedBox(height: 8),
+        ],
+      ),
     );
   }
 }

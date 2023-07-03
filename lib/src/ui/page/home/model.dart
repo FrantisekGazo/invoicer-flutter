@@ -33,7 +33,11 @@ abstract class HomePageModel {
 
   ValueNotifier<DateTime> get dateIssued;
 
+  ValueListenable<List<Client>> get clients;
+
   ValueNotifier<Client?> get client;
+
+  ValueListenable<Supplier?> get supplier;
 
   ValueListenable<List<Client>> get availableClients;
 
@@ -63,6 +67,7 @@ class HomePageModelImpl implements HomePageModel {
     map: (supplier) => supplier?.clients ?? const [],
   );
   final _client = ValueNotifier<Client?>(null);
+  final _clients = ValueNotifier<List<Client>>(const []);
   final _invoiceNumber = TextEditingController();
   final _dateIssued = ValueNotifier(DateTime.now());
   final _dateDue = ValueNotifier(DateTime.now());
@@ -87,6 +92,12 @@ class HomePageModelImpl implements HomePageModel {
 
   @override
   ValueNotifier<Client?> get client => _client;
+
+  @override
+  ValueNotifier<List<Client>> get clients => _clients;
+
+  @override
+  ValueListenable<Supplier?> get supplier => _supplier;
 
   @override
   TextEditingController get invoiceNumber => _invoiceNumber;
@@ -119,8 +130,8 @@ class HomePageModelImpl implements HomePageModel {
         return false;
       }
 
-      _client.value = supplier.clients
-          .lastWhere((it) => it.name.toLowerCase().contains('ventrata'));
+      _clients.value = supplier.clients;
+      _client.value = supplier.clients.lastOrNull;
       _resetInvoiceNumber();
       final now = DateTime.now();
       _dateIssued.value = now;
