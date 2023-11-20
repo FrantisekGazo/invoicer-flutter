@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 class SafeValueNotifier<T> extends ValueNotifier<T> {
-  SafeValueNotifier(T value) : super(value);
+  SafeValueNotifier(super.value);
 
   @override
   void notifyListeners() {
@@ -409,7 +409,7 @@ class CombinedValueNotifier3<T1, T2, T3, R> extends SafeChangeNotifier
 /// Keeps the initial value and does not allow it to be changed.
 ///
 class ImmutableValueNotifier<T> extends ValueNotifier<T> {
-  ImmutableValueNotifier(value) : super(value);
+  ImmutableValueNotifier(super.value);
 
   @override
   set value(T val) {
@@ -422,7 +422,7 @@ class ImmutableValueNotifier<T> extends ValueNotifier<T> {
 /// and needs to be dismissed when no longer needed.
 ///
 class LocalValueNotifier<T> extends ValueNotifier<T> {
-  LocalValueNotifier(T value) : super(value);
+  LocalValueNotifier(super.value);
 }
 
 extension ValueNotifierExtLocal<T> on ValueNotifier<T> {

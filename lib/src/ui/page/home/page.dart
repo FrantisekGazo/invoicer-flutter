@@ -11,7 +11,7 @@ import 'package:invoicer/src/data/model/supplier.dart';
 import 'package:invoicer/src/ui/page/home/model.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -226,9 +226,9 @@ class InvoiceItemView extends StatelessWidget {
   final InvoiceItemModel model;
 
   const InvoiceItemView({
-    Key? key,
+    super.key,
     required this.model,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -257,10 +257,10 @@ class DatePickerItem extends StatelessWidget {
   final ValueNotifier<DateTime> date;
 
   const DatePickerItem({
-    Key? key,
+    super.key,
     required this.label,
     required this.date,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

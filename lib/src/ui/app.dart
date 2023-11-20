@@ -5,7 +5,7 @@ import 'package:invoicer/src/ui/page/home/page.dart';
 import 'package:invoicer/src/ui/page/splash/page.dart';
 
 class InvoicerApp extends StatefulWidget {
-  const InvoicerApp({Key? key}) : super(key: key);
+  const InvoicerApp({super.key});
 
   @override
   State<InvoicerApp> createState() => _InvoicerAppState();
