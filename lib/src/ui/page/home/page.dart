@@ -75,17 +75,18 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: ListView(
-          children: [
-            SizedBox(
-              height: 4,
-              child: (state == InvoiceDataState.initializing)
-                  ? const LinearProgressIndicator()
-                  : null,
-            ),
-            if (state == InvoiceDataState.initFailed)
-              Expanded(
-                child: Column(
+        body: Builder(
+          builder: (context) {
+            switch (state) {
+              case InvoiceDataState.initializing:
+                return const Column(
+                  children: [
+                    LinearProgressIndicator(),
+                    Spacer(),
+                  ],
+                );
+              case InvoiceDataState.initFailed:
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -96,12 +97,10 @@ class _HomePageState extends State<HomePage> {
                       child: const Text('Try again'),
                     ),
                   ],
-                ),
-              ),
-            if (state == InvoiceDataState.ready ||
-                state == InvoiceDataState.creating)
-              Expanded(
-                child: Padding(
+                );
+              case InvoiceDataState.ready:
+              case InvoiceDataState.creating:
+                return Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -125,9 +124,7 @@ class _HomePageState extends State<HomePage> {
                           ValueListenableBuilder<Supplier?>(
                             valueListenable: _model.supplier,
                             builder: (context, supplier, _) =>
-                                (supplier != null)
-                                    ? SupplierInfoItem(supplier: supplier)
-                                    : const SizedBox.shrink(),
+                                (supplier != null) ? SupplierInfoItem(supplier: supplier) : const SizedBox.shrink(),
                           ),
                           ClientPickerItem(
                             clients: _model.clients,
@@ -159,16 +156,17 @@ class _HomePageState extends State<HomePage> {
                       ValueListenableBuilder<List<InvoiceItemModel>>(
                         valueListenable: _model.items,
                         builder: (context, items, _) => Column(
-                          children: items
-                              .map((it) => InvoiceItemView(model: it))
-                              .toList(),
+                          children: items.map((it) => InvoiceItemView(model: it)).toList(),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ),
-          ],
+                );
+              case InvoiceDataState.none:
+                // nothing to show
+                return Container();
+            }
+          },
         ),
         floatingActionButton: (state == InvoiceDataState.ready)
             ? FloatingActionButton(
