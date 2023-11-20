@@ -75,125 +75,113 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: Builder(
-          builder: (context) {
-            switch (state) {
-              case InvoiceDataState.initializing:
-                return const Column(
-                  children: [
-                    LinearProgressIndicator(),
-                    Spacer(),
-                  ],
-                );
-              case InvoiceDataState.initFailed:
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Initialization failed!'),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: _model.reload,
-                      child: const Text('Try again'),
+        body: switch (state) {
+          InvoiceDataState.none => Container(),
+          InvoiceDataState.initializing => const Column(
+              children: [
+                LinearProgressIndicator(),
+                Spacer(),
+              ],
+            ),
+          InvoiceDataState.initFailed => Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Initialization failed!'),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: _model.reload,
+                  child: const Text('Try again'),
+                ),
+              ],
+            ),
+          InvoiceDataState.ready || InvoiceDataState.creating => Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 120,
+                    child: TextField(
+                      controller: _model.invoiceNumber,
+                      decoration: const InputDecoration(
+                        label: Text('Number'),
+                      ),
                     ),
-                  ],
-                );
-              case InvoiceDataState.ready:
-              case InvoiceDataState.creating:
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  const Divider(height: 16),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    spacing: 16,
+                    runSpacing: 16,
                     children: [
-                      SizedBox(
-                        width: 120,
-                        child: TextField(
-                          controller: _model.invoiceNumber,
-                          decoration: const InputDecoration(
-                            label: Text('Number'),
-                          ),
-                        ),
+                      ValueListenableBuilder<Supplier?>(
+                        valueListenable: _model.supplier,
+                        builder: (context, supplier, _) =>
+                            (supplier != null) ? SupplierInfoItem(supplier: supplier) : const SizedBox.shrink(),
                       ),
-                      const Divider(height: 16),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        spacing: 16,
-                        runSpacing: 16,
-                        children: [
-                          ValueListenableBuilder<Supplier?>(
-                            valueListenable: _model.supplier,
-                            builder: (context, supplier, _) =>
-                                (supplier != null) ? SupplierInfoItem(supplier: supplier) : const SizedBox.shrink(),
-                          ),
-                          ClientPickerItem(
-                            clients: _model.clients,
-                            selected: _model.client,
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 16),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        spacing: 16,
-                        runSpacing: 16,
-                        children: [
-                          DatePickerItem(
-                            label: 'Issued',
-                            date: _model.dateIssued,
-                          ),
-                          DatePickerItem(
-                            label: 'Due',
-                            date: _model.dateDue,
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 24),
-                      Text(
-                        'Items:',
-                        style: theme.textTheme.titleMedium,
-                      ),
-                      ValueListenableBuilder<List<InvoiceItemModel>>(
-                        valueListenable: _model.items,
-                        builder: (context, items, _) => Column(
-                          children: items.map((it) => InvoiceItemView(model: it)).toList(),
-                        ),
+                      ClientPickerItem(
+                        clients: _model.clients,
+                        selected: _model.client,
                       ),
                     ],
                   ),
-                );
-              case InvoiceDataState.none:
-                // nothing to show
-                return Container();
-            }
-          },
-        ),
-        floatingActionButton: (state == InvoiceDataState.ready)
-            ? FloatingActionButton(
-                onPressed: () async {
-                  final success = await _model.submit();
-                  if (mounted) {
-                    final snackBar = SnackBar(
-                      content: Text(
-                        success
-                            ? 'Invoice ${_model.invoiceNumber.text} successfully created'
-                            : 'Invoice creation failed',
+                  const Divider(height: 16),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      DatePickerItem(
+                        label: 'Issued',
+                        date: _model.dateIssued,
                       ),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
-                },
-                child: const Icon(Icons.arrow_circle_down),
-              )
-            : (state == InvoiceDataState.creating)
-                ? FloatingActionButton(
-                    onPressed: null,
-                    child: SizedBox.fromSize(
-                      size: const Size.square(24),
-                      child: const CircularProgressIndicator(),
+                      DatePickerItem(
+                        label: 'Due',
+                        date: _model.dateDue,
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  Text(
+                    'Items:',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  ValueListenableBuilder<List<InvoiceItemModel>>(
+                    valueListenable: _model.items,
+                    builder: (context, items, _) => Column(
+                      children: items.map((it) => InvoiceItemView(model: it)).toList(),
                     ),
-                  )
-                : null,
+                  ),
+                ],
+              ),
+            ),
+        },
+        floatingActionButton: switch (state) {
+          InvoiceDataState.ready => FloatingActionButton(
+              onPressed: () async {
+                final success = await _model.submit();
+                if (mounted) {
+                  final snackBar = SnackBar(
+                    content: Text(
+                      success ? 'Invoice ${_model.invoiceNumber.text} successfully created' : 'Invoice creation failed',
+                    ),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+              },
+              child: const Icon(Icons.arrow_circle_down),
+            ),
+          InvoiceDataState.creating => FloatingActionButton(
+              onPressed: null,
+              child: SizedBox.fromSize(
+                size: const Size.square(24),
+                child: const CircularProgressIndicator(),
+              ),
+            ),
+          _ => null,
+        },
       ),
     );
   }
