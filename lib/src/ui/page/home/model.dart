@@ -175,9 +175,9 @@ class HomePageModelImpl implements HomePageModel {
             .map(
               (it) => InvoiceItem(
                 name: it.name.text,
-                amount: it.quantity.value,
-                unit: 'pc',
-                price: double.tryParse(it.price.text) ?? 0,
+                amount: double.tryParse(it.quantity.text) ?? 1,
+                unit: it.unit.text,
+                price: double.tryParse(it.unitPrice.text) ?? 0,
               ),
             )
             .toList(),

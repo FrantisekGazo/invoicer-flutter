@@ -189,22 +189,26 @@ class _HomePageState extends State<HomePage> {
 
 class InvoiceItemModel implements Disposable {
   final TextEditingController name;
-  final ValueNotifier<double> quantity;
-  final TextEditingController price;
+  final TextEditingController quantity;
+  final TextEditingController unit;
+  final TextEditingController unitPrice;
 
   InvoiceItemModel({
     String? name,
     double? quantity,
-    double? price,
+    String? unit,
+    double? unitPrice,
   })  : this.name = TextEditingController(text: name),
-        this.quantity = ValueNotifier(quantity ?? 1.0),
-        this.price = TextEditingController(text: price?.toString() ?? '100');
+        this.quantity = TextEditingController(text: (quantity ?? 1).toString()),
+        this.unit = TextEditingController(text: unit ?? 'MD'),
+        this.unitPrice = TextEditingController(text: unitPrice?.toString() ?? '100');
 
   @override
   FutureOr onDispose() async {
     name.dispose();
     quantity.dispose();
-    price.dispose();
+    unit.dispose();
+    unitPrice.dispose();
   }
 }
 
@@ -227,7 +231,23 @@ class InvoiceItemView extends StatelessWidget {
         SizedBox(
           width: 100,
           child: TextField(
-            controller: model.price,
+            controller: model.quantity,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 50,
+          child: TextField(
+            controller: model.unit,
+            keyboardType: TextInputType.text,
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 100,
+          child: TextField(
+            controller: model.unitPrice,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
         ),
