@@ -10,7 +10,7 @@ import 'package:invoicer/src/data/model/invoice.dart';
 import 'package:invoicer/src/data/model/supplier.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/pdf.dart';
-import 'package:invoicer/src/ui/page/home/page.dart';
+import 'package:invoicer/src/ui/page/home/form/item_row.dart';
 import 'package:invoicer/src/util/notifier.dart';
 import 'package:mutex/mutex.dart';
 
@@ -47,11 +47,15 @@ abstract class HomePageModel {
 
   void dispose();
 
-  void resetMainDir();
+  Future<void> resetMainDir();
 
-  void reload();
+  Future<void> reload();
 
   void openInvoicesDir();
+
+  void removeItem(InvoiceItemModel item);
+
+  void addItem();
 }
 
 class HomePageModelImpl implements HomePageModel {
@@ -112,8 +116,8 @@ class HomePageModelImpl implements HomePageModel {
   ValueNotifier<List<InvoiceItemModel>> get items => _items;
 
   @override
-  void reload() {
-    _stateMutex.protect(() async {
+  Future<void> reload() async {
+    await _stateMutex.protect(() async {
       _state.value = InvoiceDataState.initializing;
 
       final outDir = outputDir.value;
@@ -136,9 +140,9 @@ class HomePageModelImpl implements HomePageModel {
       final now = DateTime.now();
       _dateIssued.value = now;
       _dateDue.value = DateTime(now.year, now.month + 1, 0);
-      _items.value = [
-        InvoiceItemModel(name: 'Application development'),
-      ];
+      if (_items.value.isEmpty) {
+        addItem(); // add a default item
+      }
 
       await Future.delayed(const Duration(milliseconds: 500));
 
@@ -199,13 +203,28 @@ class HomePageModelImpl implements HomePageModel {
   }
 
   @override
-  void resetMainDir() {
-    _fileService.resetMainDirectory();
+  Future<void> resetMainDir() async {
+    await _fileService.resetMainDirectory();
+    await reload();
   }
 
   @override
   void openInvoicesDir() {
     _fileService.openInvoicesDir();
+  }
+
+  @override
+  void removeItem(InvoiceItemModel item) {
+    _items.value = _items.value.whereNot((it) => it == item).toList();
+    item.onDispose();
+  }
+
+  @override
+  void addItem() {
+    _items.value = [
+      ..._items.value,
+      InvoiceItemModel(name: 'Application development'),
+    ];
   }
 
   @override

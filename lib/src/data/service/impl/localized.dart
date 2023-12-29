@@ -87,7 +87,7 @@ class _EnLocalizedDocument implements LocalizedInvoice {
   String get itemUnit => 'Unit';
 
   @override
-  String get itemUnitCost => 'Unit cost';
+  String get itemUnitCost => 'Unit Price';
 
   @override
   String get itemPrice => 'Price';

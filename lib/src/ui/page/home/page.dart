@@ -1,13 +1,12 @@
-import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:intl/intl.dart';
 import 'package:invoicer/src/data/di.dart';
-import 'package:invoicer/src/data/model/client.dart';
 import 'package:invoicer/src/data/model/supplier.dart';
+import 'package:invoicer/src/ui/page/home/form/client.dart';
+import 'package:invoicer/src/ui/page/home/form/date_picker.dart';
+import 'package:invoicer/src/ui/page/home/form/item_row.dart';
+import 'package:invoicer/src/ui/page/home/form/supplier.dart';
 import 'package:invoicer/src/ui/page/home/model.dart';
 
 class HomePage extends StatefulWidget {
@@ -148,10 +147,29 @@ class _HomePageState extends State<HomePage> {
                     'Items:',
                     style: theme.textTheme.titleMedium,
                   ),
-                  ValueListenableBuilder<List<InvoiceItemModel>>(
-                    valueListenable: _model.items,
-                    builder: (context, items, _) => Column(
-                      children: items.map((it) => InvoiceItemView(model: it)).toList(),
+                  const InvoiceItemHeaderView(),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        ValueListenableBuilder<List<InvoiceItemModel>>(
+                          valueListenable: _model.items,
+                          builder: (context, items, _) => Column(
+                            children: items
+                                .map(
+                                  (it) => InvoiceItemView(
+                                    model: it,
+                                    onDeleted: _model.removeItem,
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        IconButton(
+                          onPressed: _model.addItem,
+                          icon: const Icon(Icons.add),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -182,232 +200,6 @@ class _HomePageState extends State<HomePage> {
             ),
           _ => null,
         },
-      ),
-    );
-  }
-}
-
-class InvoiceItemModel implements Disposable {
-  final TextEditingController name;
-  final TextEditingController quantity;
-  final TextEditingController unit;
-  final TextEditingController unitPrice;
-
-  InvoiceItemModel({
-    String? name,
-    double? quantity,
-    String? unit,
-    double? unitPrice,
-  })  : this.name = TextEditingController(text: name),
-        this.quantity = TextEditingController(text: (quantity ?? 1).toString()),
-        this.unit = TextEditingController(text: unit ?? 'MD'),
-        this.unitPrice = TextEditingController(text: unitPrice?.toString() ?? '100');
-
-  @override
-  FutureOr onDispose() async {
-    name.dispose();
-    quantity.dispose();
-    unit.dispose();
-    unitPrice.dispose();
-  }
-}
-
-class InvoiceItemView extends StatelessWidget {
-  final InvoiceItemModel model;
-
-  const InvoiceItemView({
-    super.key,
-    required this.model,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(controller: model.name),
-        ),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 100,
-          child: TextField(
-            controller: model.quantity,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          ),
-        ),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 50,
-          child: TextField(
-            controller: model.unit,
-            keyboardType: TextInputType.text,
-          ),
-        ),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 100,
-          child: TextField(
-            controller: model.unitPrice,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class DatePickerItem extends StatelessWidget {
-  static final _dateFormatter = DateFormat('dd/MM/yyyy');
-
-  final String label;
-  final ValueNotifier<DateTime> date;
-
-  const DatePickerItem({
-    super.key,
-    required this.label,
-    required this.date,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label),
-            const SizedBox(width: 4),
-            const Icon(Icons.today),
-            const SizedBox(width: 4),
-            ValueListenableBuilder<DateTime>(
-              valueListenable: date,
-              builder: (context, dateValue, _) => Text(
-                _dateFormatter.format(dateValue),
-              ),
-            ),
-          ],
-        ),
-      ),
-      onTap: () async {
-        final value = date.value;
-        final selected = await showDatePicker(
-          context: context,
-          initialDate: value,
-          firstDate: value.add(const Duration(days: -365)),
-          lastDate: value.add(const Duration(days: 365)),
-        );
-        if (selected != null) {
-          date.value = selected;
-        }
-      },
-    );
-  }
-}
-
-class ClientPickerItem extends StatelessWidget {
-  final ValueNotifier<Client?> selected;
-  final ValueListenable<List<Client>> clients;
-
-  const ClientPickerItem({
-    super.key,
-    required this.selected,
-    required this.clients,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<Client>>(
-      valueListenable: clients,
-      builder: (context, all, _) => ValueListenableBuilder<Client?>(
-        valueListenable: selected,
-        builder: (context, selectedClient, _) {
-          final theme = Theme.of(context);
-          final address = selectedClient?.address;
-          final dic = selectedClient?.dic;
-          final icdph = selectedClient?.icdph;
-          final ico = selectedClient?.ico;
-
-          return DefaultTextStyle.merge(
-            style: theme.textTheme.bodySmall,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Client:'),
-                DropdownButton<Client>(
-                  items: all
-                      .map(
-                        (it) => DropdownMenuItem<Client>(
-                          value: it,
-                          child: Text(it.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    selected.value = value;
-                  },
-                  value: selectedClient,
-                ),
-                if (address != null) Text(address.join('\n')),
-                const SizedBox(height: 8),
-                if (ico != null) Text('IČO: $ico'),
-                if (dic != null) Text('DIČ: $dic'),
-                if (icdph != null) Text('IČ DPH: $icdph'),
-                const SizedBox(height: 8),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class SupplierInfoItem extends StatelessWidget {
-  final Supplier supplier;
-
-  const SupplierInfoItem({
-    super.key,
-    required this.supplier,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final email = supplier.email;
-    final phone = supplier.phone;
-    final dic = supplier.dic;
-    final icdph = supplier.icdph;
-    final ico = supplier.ico;
-    final bankAccount = supplier.bankAccount;
-
-    return DefaultTextStyle.merge(
-      style: theme.textTheme.bodySmall,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Supplier:'),
-          const SizedBox(height: 16),
-          Text(
-            supplier.name,
-            style: theme.textTheme.titleMedium,
-          ),
-          const SizedBox(height: 16),
-          Text(supplier.address.join('\n')),
-          const SizedBox(height: 8),
-          Text('IČO: $ico', style: theme.textTheme.bodyMedium),
-          if (dic != null) Text('DIČ: $dic'),
-          if (icdph != null) Text('IČ DPH: $icdph'),
-          const SizedBox(height: 8),
-          if (email != null) Text('E-mail: $email'),
-          if (phone != null) Text('Phone: $phone'),
-          const SizedBox(height: 8),
-          const Text('Bank account:'),
-          Text(bankAccount.iban, style: theme.textTheme.bodyMedium),
-          Text('SWIFT: ${bankAccount.swift}'),
-          const SizedBox(height: 8),
-        ],
       ),
     );
   }
