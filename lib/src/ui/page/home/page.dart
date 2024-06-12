@@ -186,6 +186,7 @@ class _HomePageState extends State<HomePage> {
                       success ? 'Invoice ${_model.invoiceNumber.text} successfully created' : 'Invoice creation failed',
                     ),
                   );
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 }
               },

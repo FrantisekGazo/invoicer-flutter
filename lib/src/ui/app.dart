@@ -31,8 +31,12 @@ class _InvoicerAppState extends State<InvoicerApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: ThemeData.light(
+        useMaterial3: false,
+      ),
+      darkTheme: ThemeData.dark(
+        useMaterial3: false,
+      ),
       home: Navigator(
         pages: [
           initialized
