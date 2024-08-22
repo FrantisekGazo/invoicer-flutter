@@ -41,12 +41,12 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
     );
     final signature = _fileService.getFile(invoice.supplier.signaturePath);
     final signatureBytes = await signature.readAsBytes();
-    final localized =
-        _localizedService.getLocalizedInvoice(invoice.client.isForeign);
+    final localized = _localizedService.getLocalizedInvoice(invoice.client.isForeign);
 
     return Document(theme: theme)
       ..addPage(
         Page(
+          pageFormat: PdfPageFormat.a4,
           build: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -161,7 +161,10 @@ class SupplierContainer extends StatelessWidget {
   @override
   Widget build(Context context) {
     final theme = Theme.of(context);
-    final stylePar7 = theme.defaultTextStyle.copyWith(fontSize: 8);
+    final textStyleSmall = theme.defaultTextStyle.copyWith(fontSize: 8);
+    final register = supplier.register;
+    final phone = supplier.phone;
+    final email = supplier.email;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -176,24 +179,30 @@ class SupplierContainer extends StatelessWidget {
         ...supplier.address.map((it) => Text(it)),
         SizedBox(height: 4),
         Text('${localized.ico}: ${supplier.ico}'),
-        if (client.lang != Language.en)
-          Text('${localized.dic}: ${supplier.dic}'),
+        if (client.lang != Language.en) Text('${localized.dic}: ${supplier.dic}'),
         ...(client.isForeign)
             ? [
                 Text('${localized.icdph}: ${supplier.icdph}'),
                 SizedBox(height: 4),
-                Text(localized.dphPar7Part1, style: stylePar7),
-                Text(localized.dphPar7Part2, style: stylePar7),
+                Text(localized.dphPar7Part1, style: textStyleSmall),
+                Text(localized.dphPar7Part2, style: textStyleSmall),
               ]
             : [
                 SizedBox(height: 4),
-                Text(localized.dphNo, style: stylePar7),
+                Text(localized.dphNo, style: textStyleSmall),
               ],
-        SizedBox(height: 4),
-        if (supplier.phone != null)
-          Text('${localized.phone}: ${supplier.phone}'),
-        if (supplier.email != null)
-          Text('${localized.email}: ${supplier.email}'),
+        if (register != null) ...[
+          SizedBox(height: 4),
+          Text(
+            '${localized.registerCourt(register.court)}, ${localized.registerSection} ${register.section}, ${localized.registerInsertNo} ${register.insertNo}',
+            style: textStyleSmall,
+          ),
+        ],
+        if (phone != null || email != null) ...[
+          SizedBox(height: 4),
+          if (phone != null) Text('${localized.phone}: $phone'),
+          if (email != null) Text('${localized.email}: $email'),
+        ],
       ],
     );
   }
@@ -240,12 +249,9 @@ class ClientContainer extends StatelessWidget {
                     Text(client.name, style: theme.header5),
                     ...client.address.map((it) => Text(it)),
                     SizedBox(height: 4),
-                    if (client.ico != null)
-                      Text('${localized.ico}: ${client.ico}'),
-                    if (client.dic != null)
-                      Text('${localized.dic}: ${client.dic}'),
-                    if (client.icdph != null)
-                      Text('${localized.icdph}: ${client.icdph}'),
+                    if (client.ico != null) Text('${localized.ico}: ${client.ico}'),
+                    if (client.dic != null) Text('${localized.dic}: ${client.dic}'),
+                    if (client.icdph != null) Text('${localized.icdph}: ${client.icdph}'),
                   ],
                 ),
               ),

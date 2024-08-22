@@ -1,3 +1,4 @@
+import 'package:invoicer/src/data/model/register.dart';
 import 'package:invoicer/src/data/service/localized.dart';
 
 class LocalizedServiceImpl implements LocalizedService {
@@ -35,8 +36,18 @@ class _EnLocalizedDocument implements LocalizedInvoice {
   String get dphPar7Part1 => 'Invoice is in reverse charge mode.';
 
   @override
-  String get dphPar7Part2 =>
-      'The buyer is obligated to fill in the VAT amounts and pay the tax.';
+  String get dphPar7Part2 => 'The buyer is obligated to fill in the VAT amounts and pay the tax.';
+
+  @override
+  String registerCourt(RegisterCourt court) => switch (court) {
+        RegisterCourt.za => 'Business Register of the DC Žilina',
+      };
+
+  @override
+  String get registerSection => 'section';
+
+  @override
+  String get registerInsertNo => 'insert no.';
 
   @override
   String get phone => 'Phone';
@@ -145,6 +156,17 @@ class _SkLocalizedDocument implements LocalizedInvoice {
   String get dphPar7Part2 => 'Prenesenie daňovej povinnosti.';
 
   @override
+  String registerCourt(RegisterCourt court) => switch (court) {
+        RegisterCourt.za => 'Obchodný register Okresného súdu Žilina',
+      };
+
+  @override
+  String get registerSection => 'oddiel';
+
+  @override
+  String get registerInsertNo => 'vložka č.';
+
+  @override
   String get phone => 'Telefón';
 
   @override
@@ -205,15 +227,13 @@ class _SkLocalizedDocument implements LocalizedInvoice {
   String get itemNameDesktop => 'Vývoj desktop aplikácie - projekt';
 
   @override
-  String get itemNamePc =>
-      'Výdavky nevyhnutne vynaložené v súvislosti s poskytovanými službami - projekt';
+  String get itemNamePc => 'Výdavky nevyhnutne vynaložené v súvislosti s poskytovanými službami - projekt';
 
   @override
   String get itemNameGeneral => 'Poskytovanie prográmatorských služieb';
 
   @override
-  String get itemNameProvision =>
-      'Mimoriadna provízia v súlade s čl. IV, ods. 4 Zmluvy o poskytovaní služieb';
+  String get itemNameProvision => 'Mimoriadna provízia v súlade s čl. IV, ods. 4 Zmluvy o poskytovaní služieb';
 
   @override
   String get unitPc => 'ks';

@@ -40,14 +40,9 @@ class Client implements Comparable<Client> {
           ico: data['ico'],
           dic: data['dic'],
           icdph: data['icdph'],
-          projects: (data['projects'] as List)
-              .cast<Map<String, dynamic>>()
-              .map(Project.fromJson)
-              .toList(),
+          projects: (data['projects'] as List).cast<Map<String, dynamic>>().map(Project.fromJson).toList(),
           order: data['order'],
-          lang: (data['lang'] != null)
-              ? LanguageUtil.forName(data['lang'])
-              : Language.sk,
+          lang: (data['lang'] != null) ? Language.forName(data['lang']) : Language.sk,
         );
 
   bool get isForeign {

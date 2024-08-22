@@ -1,6 +1,7 @@
 import 'package:invoicer/src/data/model/bank_account.dart';
 import 'package:invoicer/src/data/model/client.dart';
 import 'package:invoicer/src/data/model/currency.dart';
+import 'package:invoicer/src/data/model/register.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -10,6 +11,7 @@ class Supplier {
   final String ico;
   final String? dic;
   final String? icdph;
+  final RegisterInsertDetails? register;
   final String? phone;
   final String? email;
   final BankAccount bankAccount;
@@ -24,6 +26,7 @@ class Supplier {
     required this.ico,
     this.dic,
     this.icdph,
+    this.register,
     this.phone,
     this.email,
     required this.bankAccount,
@@ -40,16 +43,14 @@ class Supplier {
           ico: data['ico'],
           dic: data['dic'],
           icdph: data['icdph'],
+          register: (data['register'] != null) ? RegisterInsertDetails.fromJson(data['register']) : null,
           phone: data['phone'],
           email: data['email'],
           bankAccount: BankAccount.fromJson(data['bank_account']),
           currency: CurrencyUtil.forName(data['currency']),
           numbering: data['numbering'],
           signaturePath: data['signature'],
-          clients: (data['clients'] as List)
-              .cast<Map<String, dynamic>>()
-              .map(Client.formJson)
-              .toList(),
+          clients: (data['clients'] as List).cast<Map<String, dynamic>>().map(Client.formJson).toList(),
         );
 
   Map<String, dynamic> toJson() {
@@ -59,6 +60,7 @@ class Supplier {
       'ico': ico,
       'dic': dic,
       'icdph': icdph,
+      'register': register?.toJson(),
       'phone': phone,
       'email': email,
       'bank_account': bankAccount.toJson(),

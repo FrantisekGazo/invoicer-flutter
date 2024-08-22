@@ -1,3 +1,5 @@
+import 'package:invoicer/src/data/model/register.dart';
+
 ///
 /// Provides localized data.
 ///
@@ -28,6 +30,12 @@ abstract class LocalizedInvoice {
   String get dphPar7Part1;
 
   String get dphPar7Part2;
+
+  String registerCourt(RegisterCourt court);
+
+  String get registerSection;
+
+  String get registerInsertNo;
 
   String get phone;
 
