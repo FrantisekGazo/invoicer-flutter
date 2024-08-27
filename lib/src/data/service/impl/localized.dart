@@ -104,16 +104,10 @@ class _EnLocalizedDocument implements LocalizedInvoice {
   String get itemPrice => 'Price';
 
   @override
-  String get itemNameMobile => 'Mobile application development - project';
-
-  @override
-  String get itemNameDesktop => 'Desktop application development - project';
-
-  @override
   String get itemNamePc => throw UnsupportedError('no translation');
 
   @override
-  String get itemNameGeneral => 'Application development';
+  String get itemNameGeneral => 'Software development services';
 
   @override
   String get itemNameProvision => throw UnsupportedError('no translation');
@@ -219,12 +213,6 @@ class _SkLocalizedDocument implements LocalizedInvoice {
 
   @override
   String get itemPrice => 'Cena';
-
-  @override
-  String get itemNameMobile => 'Vývoj mobilnej aplikácie - projekt';
-
-  @override
-  String get itemNameDesktop => 'Vývoj desktop aplikácie - projekt';
 
   @override
   String get itemNamePc => 'Výdavky nevyhnutne vynaložené v súvislosti s poskytovanými službami - projekt';

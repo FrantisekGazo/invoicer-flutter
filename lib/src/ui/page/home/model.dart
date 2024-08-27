@@ -223,7 +223,7 @@ class HomePageModelImpl implements HomePageModel {
   void addItem() {
     _items.value = [
       ..._items.value,
-      InvoiceItemModel(name: 'Application development'),
+      InvoiceItemModel(name: 'Software development services'),
     ];
   }
 

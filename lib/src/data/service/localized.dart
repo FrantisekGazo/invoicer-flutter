@@ -73,10 +73,6 @@ abstract class LocalizedInvoice {
 
   String get itemPrice;
 
-  String get itemNameMobile;
-
-  String get itemNameDesktop;
-
   String get itemNamePc;
 
   String get itemNameGeneral;
