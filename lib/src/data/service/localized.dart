@@ -25,11 +25,9 @@ abstract class LocalizedInvoice {
 
   String get icdph;
 
-  String get dphNo;
+  String get vatNonPayer;
 
-  String get dphPar7Part1;
-
-  String get dphPar7Part2;
+  String get vatPar7aReverseChargeMode;
 
   String registerCourt(RegisterCourt court);
 

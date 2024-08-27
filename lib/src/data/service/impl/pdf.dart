@@ -6,8 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:invoicer/src/data/model/client.dart';
 import 'package:invoicer/src/data/model/currency.dart';
 import 'package:invoicer/src/data/model/invoice.dart';
-import 'package:invoicer/src/data/model/language.dart';
 import 'package:invoicer/src/data/model/supplier.dart';
+import 'package:invoicer/src/data/model/vat.dart';
 import 'package:invoicer/src/data/service/file.dart';
 import 'package:invoicer/src/data/service/font.dart';
 import 'package:invoicer/src/data/service/localized.dart';
@@ -76,7 +76,13 @@ class PdfBuilderServiceImpl implements PdfBuilderService {
                   ),
                 ],
               ),
-              SizedBox(height: 24),
+              SizedBox(height: 12),
+              if (invoice.supplier.vatRegistration == VatRegistration.par7a)
+                Text(
+                  localized.vatPar7aReverseChargeMode,
+                  style: theme.defaultTextStyle.copyWith(fontSize: 8),
+                ),
+              SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: _CustomVerticalDivider(),
@@ -179,25 +185,15 @@ class SupplierContainer extends StatelessWidget {
         ...supplier.address.map((it) => Text(it)),
         SizedBox(height: 4),
         Text('${localized.ico}: ${supplier.ico}'),
-        if (client.lang != Language.en) Text('${localized.dic}: ${supplier.dic}'),
-        ...(client.isForeign)
-            ? [
-                Text('${localized.icdph}: ${supplier.icdph}'),
-                SizedBox(height: 4),
-                Text(localized.dphPar7Part1, style: textStyleSmall),
-                Text(localized.dphPar7Part2, style: textStyleSmall),
-              ]
-            : [
-                SizedBox(height: 4),
-                Text(localized.dphNo, style: textStyleSmall),
-              ],
+        if (!client.isForeign) Text('${localized.dic}: ${supplier.dic}'),
+        if (supplier.icdph != null) Text('${localized.icdph}: ${supplier.icdph}'),
         if (register != null) ...[
-          SizedBox(height: 4),
           Text(
             '${localized.registerCourt(register.court)}, ${localized.registerSection} ${register.section}, ${localized.registerInsertNo} ${register.insertNo}',
             style: textStyleSmall,
           ),
         ],
+        if (supplier.vatRegistration == VatRegistration.no) Text(localized.vatNonPayer, style: textStyleSmall),
         if (phone != null || email != null) ...[
           SizedBox(height: 4),
           if (phone != null) Text('${localized.phone}: $phone'),

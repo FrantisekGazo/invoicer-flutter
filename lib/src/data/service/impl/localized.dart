@@ -21,22 +21,19 @@ class _EnLocalizedDocument implements LocalizedInvoice {
   String get client => 'Customer';
 
   @override
-  String get ico => 'Identification number';
+  String get ico => 'Reg. no';
 
   @override
-  String get dic => 'Tax number';
+  String get dic => 'Tax ID';
 
   @override
-  String get icdph => 'VAT number';
+  String get icdph => 'VAT ID';
 
   @override
-  String get dphNo => throw UnsupportedError('no translation');
+  String get vatNonPayer => throw UnsupportedError('no translation');
 
   @override
-  String get dphPar7Part1 => 'Invoice is in reverse charge mode.';
-
-  @override
-  String get dphPar7Part2 => 'The buyer is obligated to fill in the VAT amounts and pay the tax.';
+  String get vatPar7aReverseChargeMode => 'Invoice is in reverse charge mode. The buyer is obligated to fill in the VAT amounts and pay the tax.';
 
   @override
   String registerCourt(RegisterCourt court) => switch (court) {
@@ -141,13 +138,10 @@ class _SkLocalizedDocument implements LocalizedInvoice {
   String get icdph => 'IČ DPH';
 
   @override
-  String get dphNo => 'Nie je platiteľ DPH';
+  String get vatNonPayer => 'Nie je platiteľ DPH';
 
   @override
-  String get dphPar7Part1 => 'Osoba registrovaná podľa §7a zákona o DPH.';
-
-  @override
-  String get dphPar7Part2 => 'Prenesenie daňovej povinnosti.';
+  String get vatPar7aReverseChargeMode => 'Osoba registrovaná podľa §7a zákona o DPH. Prenesenie daňovej povinnosti.';
 
   @override
   String registerCourt(RegisterCourt court) => switch (court) {

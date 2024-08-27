@@ -2,6 +2,7 @@ import 'package:invoicer/src/data/model/bank_account.dart';
 import 'package:invoicer/src/data/model/client.dart';
 import 'package:invoicer/src/data/model/currency.dart';
 import 'package:invoicer/src/data/model/register.dart';
+import 'package:invoicer/src/data/model/vat.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -9,8 +10,9 @@ class Supplier {
   final String name;
   final List<String> address;
   final String ico;
-  final String? dic;
+  final String dic;
   final String? icdph;
+  final VatRegistration vatRegistration;
   final RegisterInsertDetails? register;
   final String? phone;
   final String? email;
@@ -24,8 +26,9 @@ class Supplier {
     required this.name,
     required this.address,
     required this.ico,
-    this.dic,
+    required this.dic,
     this.icdph,
+    required this.vatRegistration,
     this.register,
     this.phone,
     this.email,
@@ -43,6 +46,7 @@ class Supplier {
           ico: data['ico'],
           dic: data['dic'],
           icdph: data['icdph'],
+          vatRegistration: VatRegistration.forId(data['vat_registration']),
           register: (data['register'] != null) ? RegisterInsertDetails.fromJson(data['register']) : null,
           phone: data['phone'],
           email: data['email'],
@@ -60,6 +64,7 @@ class Supplier {
       'ico': ico,
       'dic': dic,
       'icdph': icdph,
+      'vat_registration': vatRegistration.id,
       'register': register?.toJson(),
       'phone': phone,
       'email': email,

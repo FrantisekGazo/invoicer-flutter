@@ -38,7 +38,7 @@ class SupplierInfoItem extends StatelessWidget {
           Text(supplier.address.join('\n')),
           const SizedBox(height: 8),
           Text('IČO: $ico', style: theme.textTheme.bodyMedium),
-          if (dic != null) Text('DIČ: $dic'),
+          Text('DIČ: $dic'),
           if (icdph != null) Text('IČ DPH: $icdph'),
           const SizedBox(height: 8),
           if (email != null) Text('E-mail: $email'),
