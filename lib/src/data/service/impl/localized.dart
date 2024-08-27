@@ -21,7 +21,7 @@ class _EnLocalizedDocument implements LocalizedInvoice {
   String get client => 'Customer';
 
   @override
-  String get ico => 'Reg. no';
+  String get ico => 'Reg. no.';
 
   @override
   String get dic => 'Tax ID';
