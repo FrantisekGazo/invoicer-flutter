@@ -186,7 +186,7 @@ class HomePageModelImpl implements HomePageModel {
             )
             .toList(),
         issueDate: issueDate,
-        deliveryDate: dueDate,
+        deliveryDate: issueDate,
         dueDate: dueDate,
       );
       final pdf = await _pdfBuilderService.build(invoice);
