@@ -247,7 +247,7 @@ class HomePageModelImpl implements HomePageModel {
           final id = it.path.split('/').last.replaceFirst('.pdf', '');
           return int.tryParse(id);
         })
-        .whereNotNull()
+        .nonNulls
         .sorted((a, b) => a - b)
         .lastOrNull;
     final minNumber = DateTime.now().year * 1000;

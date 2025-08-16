@@ -10,5 +10,7 @@ linter:
     unnecessary_this: false
 
 analyzer:
+  exclude:
+    - 'lib/generated_plugin_registrant.dart'
   errors:
     parameter_assignments: error

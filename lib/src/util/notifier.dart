@@ -69,15 +69,8 @@ class SafeChangeNotifier extends ChangeNotifier {
 }
 
 extension ValueListenableExt<T> on ValueListenable<T> {
-  ValueNotifier<R> map<R>({
-    required R initialValue,
-    required ValueMapper<T, R> map,
-  }) =>
-      MappedValueNotifier<T, R>(
-        initialValue: initialValue,
-        notifier: this,
-        map: map,
-      );
+  ValueNotifier<R> map<R>({required R initialValue, required ValueMapper<T, R> map}) =>
+      MappedValueNotifier<T, R>(initialValue: initialValue, notifier: this, map: map);
 }
 
 ///
@@ -86,10 +79,9 @@ extension ValueListenableExt<T> on ValueListenable<T> {
 typedef ValueCombinator<T, R> = R Function(List<T> values);
 
 ///
-/// Combines multiple [ValueListenable]<T>s to a different [ValueListenable]<R>.
+/// Combines multiple [ValueListenable]s of type [T] to a different [ValueListenable] of type [R].
 ///
-class CombinedValueNotifier<T, R> extends SafeChangeNotifier
-    implements ValueNotifier<R> {
+class CombinedValueNotifier<T, R> extends SafeChangeNotifier implements ValueNotifier<R> {
   final List<ValueListenable<T>> _notifiers = [];
   final ValueCombinator<T, R> _valueCombinator;
   late R _value;
@@ -162,20 +154,16 @@ class CombinedValueNotifier<T, R> extends SafeChangeNotifier
 typedef ValueMapper<T, R> = R Function(T value);
 
 ///
-/// Maps a [ValueListenable]<T> to a different [ValueListenable]<R>.
+/// Maps a [ValueListenable] of type [T] to a different [ValueListenable] of type [R].
 ///
-class MappedValueNotifier<T, R> extends SafeChangeNotifier
-    implements ValueNotifier<R> {
+class MappedValueNotifier<T, R> extends SafeChangeNotifier implements ValueNotifier<R> {
   final ValueMapper<T, R> _valueMapper;
   ValueListenable<T>? _notifier;
   late R _value;
 
   /// Either [initialValue] or [notifier] must be specified.
-  MappedValueNotifier({
-    required R initialValue,
-    ValueListenable<T>? notifier,
-    required ValueMapper<T, R> map,
-  }) : this._valueMapper = map {
+  MappedValueNotifier({required R initialValue, ValueListenable<T>? notifier, required ValueMapper<T, R> map})
+    : this._valueMapper = map {
     _value = initialValue;
     if (notifier != null) {
       setNotifier(notifier);
@@ -237,10 +225,10 @@ class MappedValueNotifier<T, R> extends SafeChangeNotifier
 typedef ValueCombinator2<T1, T2, R> = R Function(T1 value1, T2 value2);
 
 ///
-/// Combines [ValueListenable]<T1> and [ValueListenable]<T2> into [ValueListenable]<R>.
+/// Combines 2 [ValueListenable] of type [T1] and [T2] into [ValueListenable] of type [R].
 ///
-class CombinedValueNotifier2<T1, T2, R> extends SafeChangeNotifier
-    implements ValueNotifier<R> {
+///
+class CombinedValueNotifier2<T1, T2, R> extends SafeChangeNotifier implements ValueNotifier<R> {
   ValueListenable<T1>? _notifier1;
   ValueListenable<T2>? _notifier2;
   final ValueCombinator2<T1, T2, R> _valueCombinator;
@@ -281,19 +269,13 @@ class CombinedValueNotifier2<T1, T2, R> extends SafeChangeNotifier
     }
   }
 
-  void setNotifiers(
-    ValueListenable<T1> notifier1,
-    ValueListenable<T2> notifier2,
-  ) {
+  void setNotifiers(ValueListenable<T1> notifier1, ValueListenable<T2> notifier2) {
     _clearNotifier();
     _setNotifiers(notifier1, notifier2);
     _updateValue();
   }
 
-  void _setNotifiers(
-    ValueListenable<T1> notifier1,
-    ValueListenable<T2> notifier2,
-  ) {
+  void _setNotifiers(ValueListenable<T1> notifier1, ValueListenable<T2> notifier2) {
     _notifier1 = notifier1;
     _notifier2 = notifier2;
     notifier1.addListener(_updateValue);
@@ -315,14 +297,12 @@ class CombinedValueNotifier2<T1, T2, R> extends SafeChangeNotifier
 ///
 /// Combines values of type [T1], [T2] and [T3] to value of type [R].
 ///
-typedef ValueCombinator3<T1, T2, T3, R> = R Function(
-    T1 value1, T2 value2, T3 value3);
+typedef ValueCombinator3<T1, T2, T3, R> = R Function(T1 value1, T2 value2, T3 value3);
 
 ///
-/// Combines [ValueListenable]<T1> and [ValueListenable]<T2> and [ValueListenable]<T3> into [ValueListenable]<R>.
+/// Combines 3 [ValueListenable] of type [T1], [T2] and [T3] into [ValueListenable] of type [R].
 ///
-class CombinedValueNotifier3<T1, T2, T3, R> extends SafeChangeNotifier
-    implements ValueNotifier<R> {
+class CombinedValueNotifier3<T1, T2, T3, R> extends SafeChangeNotifier implements ValueNotifier<R> {
   ValueListenable<T1>? _notifier1;
   ValueListenable<T2>? _notifier2;
   ValueListenable<T3>? _notifier3;
@@ -363,27 +343,17 @@ class CombinedValueNotifier3<T1, T2, T3, R> extends SafeChangeNotifier
     final notifier2 = _notifier2;
     final notifier3 = _notifier3;
     if (notifier1 != null && notifier2 != null && notifier3 != null) {
-      _setValue(
-        _valueCombinator(notifier1.value, notifier2.value, notifier3.value),
-      );
+      _setValue(_valueCombinator(notifier1.value, notifier2.value, notifier3.value));
     }
   }
 
-  void setNotifiers(
-    ValueListenable<T1> notifier1,
-    ValueListenable<T2> notifier2,
-    ValueListenable<T3> notifier3,
-  ) {
+  void setNotifiers(ValueListenable<T1> notifier1, ValueListenable<T2> notifier2, ValueListenable<T3> notifier3) {
     _clearNotifier();
     _setNotifiers(notifier1, notifier2, notifier3);
     _updateValue();
   }
 
-  void _setNotifiers(
-    ValueListenable<T1> notifier1,
-    ValueListenable<T2> notifier2,
-    ValueListenable<T3> notifier3,
-  ) {
+  void _setNotifiers(ValueListenable<T1> notifier1, ValueListenable<T2> notifier2, ValueListenable<T3> notifier3) {
     _notifier1 = notifier1;
     _notifier2 = notifier2;
     _notifier3 = notifier3;

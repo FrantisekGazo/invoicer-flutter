@@ -1,28 +1,31 @@
 name: invoicer
-description: A new Flutter project.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+description: App for creating and managing invoices.
+publish_to: none # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.4.0
-  flutter: ^3.22.0
+  sdk: ^3.9.0
+  flutter: ^3.35.0
 
 dependencies:
   flutter:
     sdk: flutter
-  meta: 1.12.0
-  collection: 1.18.0
-  file_picker: 8.0.5
+  meta: 1.16.0
+  collection: 1.19.1
+  file_picker: 10.3.1
   macos_secure_bookmarks: 0.2.1
-  pdf: 3.10.8
-  get_it: 7.7.0
-  intl: 0.19.0
+  get_it: 8.2.0
+  intl: 0.20.2
   mutex: 3.1.0
-  shared_preferences: 2.2.3
-  open_dir: 0.0.1+6
+  shared_preferences: 2.5.3
+  open_dir: 0.0.2+1
+  pdf: 3.11.3
+  # [archive] is a nested dependency of the [pdf] package,
+  # but define the version explicitly because otherwise too low version is used and that causes compile errors
+  archive: 4.0.7
 
 dev_dependencies:
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
 
